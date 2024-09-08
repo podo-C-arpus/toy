@@ -1,0 +1,47 @@
+<body>
+
+<h1>Arpusのおもちゃ箱</h1>
+<h2>k-shoot mania Tools</h2>
+<h1>zoom_side to center_split</h1>
+<h2>開発中です。しばらくお待ちください。</h2>
+
+<p>オプションを選択してください。</p>
+<p>
+zoom_sideを
+<select id="zoom">
+	<option value="0">削除してcenter_splitに置き換える</option>
+	<option value="1">維持してcenter_splitを追記する</option>
+</select>
+</p>
+<p>
+レーンの位置
+<select id="pos">
+	<option value="0">中央</option>
+	<option value="1">左側(ABL)をデフォルト位置に固定</option>
+	<option value="2">右側(CDR)をデフォルト位置に固定</option>
+</select>
+</p>
+<p>
+<input type="button" value="実行" onclick="on_click();"/>
+</p>
+<div id="output"></div>
+
+<script src="kshCenterSplit.js"></script>
+<script>
+
+function on_click(){
+	const zoom = Number(document.getElementById("zoom").value);
+	const pos = Number(document.getElementById("pos").value);
+	const file = document.getElementById("file").value;
+	let maze=result[0], start=result[1], goal=result[2];
+	let target = document.getElementById("output");
+}
+
+</script>
+
+<ul>
+	<li><a href="../index.html">back</a></li>
+</ul>
+<footer></footer>
+</body>
+</html>
