@@ -1,0 +1,61 @@
+/* CSSリセット */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#inputFile {
+  position: relative;
+  padding: 20px 0; /* 上下の padding を少なくする */
+}
+
+#dropArea {
+  position: absolute;
+  top: 40px; /* 上からの位置を調整 */
+  left: 0; /* 左寄せ */
+  width: 500px;
+  height: 100px;
+  padding: 10px;
+  border: 2px dashed #494949;
+  background: rgba(22, 165, 191, 0);
+  transition: all 0.25s cubic-bezier(0.21, 0.51, 0.51, 1);
+}
+
+#dropArea.dragover {
+  border: 2px solid #16a5bf;
+  background: rgba(22, 165, 191, 0.6);
+}
+
+#fileName {
+  text-align: left;
+  margin: 120px 0; /* 上部にスペースを追加 */
+  margin-bottom: 0px; /* dropArea との間に空白を追加 */
+}
+
+#textArea {
+  width: 500px;
+  height: 150px; /* 高さを増やしてみる */
+  padding: 10px;
+  text-align: left;
+  margin-top: 20px; /* 上部にマージンを追加 */
+}
+
+#run-button {
+    font-size: 18px; /* フォントサイズを大きくする */
+    padding: 10px 20px; /* 内側の余白を大きくする */
+    width: 150px; /* ボタンの幅を指定する（必要に応じて調整） */
+    height: 50px; /* ボタンの高さを指定する（必要に応じて調整） */
+    border: none; /* デフォルトのボーダーを削除する */
+    border-radius: 5px; /* ボタンの角を丸くする（オプション） */
+    background-color: #4CAF50; /* ボタンの背景色 */
+    color: white; /* ボタンの文字色 */
+    cursor: pointer; /* ボタンにカーソルを合わせるとポインターが表示されるようにする */
+    font-weight: bold; /* 文字を太字にする */
+    transition: background-color 0.3s; /* ホバー時の背景色変化にアニメーションを追加 */
+	margin: 10px 0; /* ボタンの上下に 10px の余白を追加 */
+}
+
+#run-button:hover {
+    background-color: #45a049; /* ホバー時の背景色 */
+}
