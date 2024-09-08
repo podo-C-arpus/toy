@@ -5,6 +5,22 @@
   box-sizing: border-box;
 }
 
+#rangeLine {
+    transform: scale(1.2); /* 要素全体のスケーリング */
+    transform-origin: top left;
+    font-size: 120%; /* テキストのサイズを120%に設定 */
+}
+
+#startLine, #endLine {
+    width: 80px;
+}
+
+#sentakuShi {
+    transform: scale(1.2); /* 要素全体のスケーリング */
+    transform-origin: top left;
+    font-size: 120%; /* テキストのサイズを120%に設定 */
+}
+
 #inputFile {
   position: relative;
   padding: 20px 0; /* 上下の padding を少なくする */
