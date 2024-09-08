@@ -5,18 +5,24 @@
 <h1>zoom_side to center_split</h1>
 <h2>開発中です。しばらくお待ちください。</h2>
 
-<p>オプションを選択してください。</p>
+
+
+
+<h2>適用範囲</h2>
+<table cellpadding="5">
+	<tr>
+		<td> <input id="startLine" type="number" value="1000"></td>
+		<td>小節から</td>
+		<td> <input id="endLine" type="number" value="1000"></td>
+		<td>小節まで</td>
+	</tr>
+</table>
+
+<h2>オプションを選択してください。</h2>
 <p>
-zoom_sideを
-<select id="zoom">
-	<option value="0">削除してcenter_splitに置き換える</option>
-	<option value="1">維持してcenter_splitを追記する</option>
-</select>
-</p>
-<p>
-レーンの位置
+オプション
 <select id="pos">
-	<option value="0">中央</option>
+	<option value="0">zoom_sideを削除して置換する</option>
 	<option value="1">左側(ABL)をデフォルト位置に固定</option>
 	<option value="2">右側(CDR)をデフォルト位置に固定</option>
 </select>
@@ -30,6 +36,8 @@ zoom_sideを
 <script>
 
 function on_click(){
+	const startLine = Number(document.getElementById("startLine").value);
+	const endLine = Number(document.getElementById("endLine").value);
 	const zoom = Number(document.getElementById("zoom").value);
 	const pos = Number(document.getElementById("pos").value);
 	const file = document.getElementById("file").value;
