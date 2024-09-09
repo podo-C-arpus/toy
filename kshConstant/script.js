@@ -1,3 +1,8 @@
+// 最大公約数 (GCD) を求める関数
+function gcd(a, b) {
+    return b === 0 ? a : gcd(b, a % b);
+}
+
 document.getElementById('run-button').addEventListener('click', () => {
 	const bom = '\uFEFF';
 	
@@ -15,6 +20,7 @@ document.getElementById('run-button').addEventListener('click', () => {
 	let modify = true;
 	let numerator =4;
 	let denominator =4;
+	let yakubun = 48;
 
     // ファイル名とテキストエリアの内容を取得
     const fileName = document.querySelector('#fileName').textContent;
@@ -62,7 +68,7 @@ document.getElementById('run-button').addEventListener('click', () => {
 				newBeat = Math.round(originalBeat * standardBPM / originalBPM);
 				newBPM = 0.001 * Math.round(1000 * (originalBPM * newBeat / originalBeat));
 				if (line >= startLine && line <= endLine) {
-					newText += `beat=${newBeat}/192\r\nt=${newBPM}\r\n`; //新たなテキストを記入
+					newText += `beat=${newBeat / gcd(newBeat, 48)}/${192 / gcd(newBeat, 48)}\r\nt=${newBPM}\r\n`; //新たなテキストを記入
 				} else if (line === endLine + 1) {
 					newText += `beat=${numerator}/${denominator}\r\nt=${originalBPM}\r\n`; //新たなテキストを記入
 				} else {
