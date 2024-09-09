@@ -49,6 +49,7 @@
   padding: 10px;
   text-align: left;
   margin-top: 10px; /* 上部にマージンを追加 */
+}
 
 #run-button {
     font-size: 18px; /* フォントサイズを大きくする */
