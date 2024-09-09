@@ -5,18 +5,16 @@
   box-sizing: border-box;
 }
 
-#rangeLine, #sentakuShi {
+#rangeLine, #inputBPM {
     transform: scale(1.2); /* 要素全体のスケーリング */
     transform-origin: top left;
     font-size: 120%; /* テキストのサイズを120%に設定 */
     margin-bottom: 20px;
 }
 
-#startLine, #endLine {
+#startLine, #endLine, #standardBPM {
     width: 80px;
 }
-
-#sentakuShi
 
 #inputFile {
   position: relative;
@@ -49,6 +47,7 @@
   padding: 10px;
   text-align: left;
   margin-top: 10px; /* 上部にマージンを追加 */
+}
 
 #run-button {
     font-size: 18px; /* フォントサイズを大きくする */

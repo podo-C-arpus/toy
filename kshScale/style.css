@@ -22,9 +22,6 @@
 }
 
 #dropArea {
-  position: absolute;
-  top: 40px; /* 上からの位置を調整 */
-  left: 0; /* 左寄せ */
   width: 500px;
   height: 100px;
   padding: 10px;
@@ -40,7 +37,7 @@
 
 #fileName {
   text-align: left;
-  margin: 120px 0; /* 上部にスペースを追加 */
+  margin: 20px 0; /* 上部にスペースを追加 */
   margin-bottom: 0px; /* dropArea との間に空白を追加 */
 }
 
@@ -49,7 +46,7 @@
   height: 150px; /* 高さを増やしてみる */
   padding: 10px;
   text-align: left;
-  margin-top: 20px; /* 上部にマージンを追加 */
+  margin-top: 10px; /* 上部にマージンを追加 */
 }
 
 #run-button {
@@ -69,4 +66,28 @@
 
 #run-button:hover {
     background-color: #45a049; /* ホバー時の背景色 */
+}
+
+footer ul {
+    list-style-type: none; /* リストマーカーを削除 */
+    padding: 0;
+}
+
+footer li {
+    margin: 0;
+}
+
+footer a {
+    font-size: 15px; /* フォントサイズを設定 */
+    padding: 5px 10px; /* パディングを設定 */
+    display: inline-block; /* サイズを反映させるためにインラインブロックを使用 */
+    text-decoration: none; /* 下線を削除 */
+    color: #000; /* テキストカラーを設定（必要に応じて変更） */
+    border: 2px solid #000; /* ボーダーを追加（必要に応じて変更） */
+    border-radius: 5px; /* 角を丸くする */
+    background-color: #f0f0f0; /* 背景色を設定（必要に応じて変更） */
+}
+
+footer a:hover {
+    background-color: #ddd; /* ホバー時の背景色 */
 }
