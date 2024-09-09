@@ -5,21 +5,18 @@
   box-sizing: border-box;
 }
 
-#rangeLine {
+#rangeLine, #sentakuShi {
     transform: scale(1.2); /* 要素全体のスケーリング */
     transform-origin: top left;
     font-size: 120%; /* テキストのサイズを120%に設定 */
+	margin-bottom: 20px;
 }
 
 #startLine, #endLine {
     width: 80px;
 }
 
-#sentakuShi {
-    transform: scale(1.2); /* 要素全体のスケーリング */
-    transform-origin: top left;
-    font-size: 120%; /* テキストのサイズを120%に設定 */
-}
+#sentakuShi
 
 #inputFile {
   position: relative;

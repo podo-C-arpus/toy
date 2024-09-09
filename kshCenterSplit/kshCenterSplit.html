@@ -9,15 +9,15 @@
 <body>
 	<h1>Arpusのおもちゃ箱</h1>
 	<h2>k-shoot mania Tools</h2>
-	<h1>zoom_side to center_split</h1>
-	<p>zoom_sideをもとに、center_splitを自動で生成します。</p>
+	<h1>zoom_sideからcenter_splitを生成</h1>
+	<p>zoom_sideの値を参照してcenter_splitを自動で生成します。</p>
 	<p>(注)kshファイルではzoom_sideとcenter_splitでスケールが4倍異なります。このツールでは自動で補正しています。</p>
 	<h3>適用範囲</h3>
 	<div id="rangeLine">
 		<p>
-			<input id="startLine" type="number" value="1">
+			<input id="startLine" type="number" step="1" value="1">
 			小節から
-			<input id="endLine" type="number" value="200">
+			<input id="endLine" type="number" step="1" value="200">
 			小節まで
 		</p>
 	</div>
@@ -31,16 +31,8 @@
 			<option value="201">center_splitの正負を反転</option>
 			<option value="300">zoom_sideを削除</option>
 			<option value="301">center_splitを削除</option>
-			<option value="402">zoom_sideのスケールを2倍にする</option>
-			<option value="403">zoom_sideのスケールを3倍にする</option>
-			<option value="404">zoom_sideのスケールを4倍にする</option>
-			<option value="502">zoom_sideのスケールを1/2倍にする</option>
-			<option value="503">zoom_sideのスケールを1/3倍にする</option>
-			<option value="504">zoom_sideのスケールを1/4倍にする</option>
 		</select>
 	</p>
-	<script src="kshCenterSplit.js">
-	</script>
 
 	<div id="inputFile">
 		<p id="dropArea">ここにファイルをドロップしてください</p>

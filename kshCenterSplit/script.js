@@ -57,30 +57,6 @@ document.getElementById('run-button').addEventListener('click', () => {
 					// 転記せず削除
 				} else if (sentakuShi == 301) { //center_splitを削除
 					newText += textLine + '\r\n'; // そのまま転記
-				} else if (sentakuShi == 402) { //zoom_sideのスケールを2倍にする
-					zoomSide = parseInt(textLine.split('=')[1], 10);
-					zoomSide = zoomSide * 2;
-					newText += `zoom_side=${zoomSide}\r\n`; //新たなテキストを記入
-				} else if (sentakuShi == 403) { //zoom_sideのスケールを3倍にする
-					zoomSide = parseInt(textLine.split('=')[1], 10);
-					zoomSide = zoomSide * 3;
-					newText += `zoom_side=${zoomSide}\r\n`; //新たなテキストを記入
-				} else if (sentakuShi == 404) { //zoom_sideのスケールを4倍にする
-					zoomSide = parseInt(textLine.split('=')[1], 10);
-					zoomSide = zoomSide * 4;
-					newText += `zoom_side=${zoomSide}\r\n`; //新たなテキストを記入
-				} else if (sentakuShi == 502) { //zoom_sideのスケールを1/2倍にする
-					zoomSide = parseInt(textLine.split('=')[1], 10);
-					zoomSide = Math.round(zoomSide / 2);
-					newText += `zoom_side=${zoomSide}\r\n`; //新たなテキストを記入
-				} else if (sentakuShi == 503) { //zoom_sideのスケールを1/3倍にする
-					zoomSide = parseInt(textLine.split('=')[1], 10);
-					zoomSide = Math.round(zoomSide / 3);
-					newText += `zoom_side=${zoomSide}\r\n`; //新たなテキストを記入
-				} else if (sentakuShi == 504) { //zoom_sideのスケールを1/4倍にする
-					zoomSide = parseInt(textLine.split('=')[1], 10);
-					zoomSide = Math.round(zoomSide / 4);
-					newText += `zoom_side=${zoomSide}\r\n`; //新たなテキストを記入
 				} else { // このelseは発生しないはず
 					newText += textLine + '\r\n'; // そのまま転記
 				}
