@@ -9,7 +9,7 @@
     transform: scale(1.2); /* 要素全体のスケーリング */
     transform-origin: top left;
     font-size: 120%; /* テキストのサイズを120%に設定 */
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 #startLine, #endLine {
@@ -24,9 +24,6 @@
 }
 
 #dropArea {
-  position: absolute;
-  top: 40px; /* 上からの位置を調整 */
-  left: 0; /* 左寄せ */
   width: 500px;
   height: 100px;
   padding: 10px;
@@ -42,7 +39,7 @@
 
 #fileName {
   text-align: left;
-  margin: 120px 0; /* 上部にスペースを追加 */
+  margin: 20px 0; /* 上部にスペースを追加 */
   margin-bottom: 0px; /* dropArea との間に空白を追加 */
 }
 
