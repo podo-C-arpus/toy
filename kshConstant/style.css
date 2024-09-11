@@ -5,6 +5,11 @@
   box-sizing: border-box;
 }
 
+p {
+    position: relative;
+    padding-left: 15px;
+}
+
 #rangeLine, #inputBPM {
     transform: scale(1.2); /* 要素全体のスケーリング */
     transform-origin: top left;

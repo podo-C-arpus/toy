@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ユーザー定義エフェクト生成</title>
+	<link rel="stylesheet" href="style.css"
+</head>
+
+<body>
+	<h1>Arpusのおもちゃ箱</h1>
+	<h2>k-shoot mania Tools</h2>
+	<h1>ユーザー定義エフェクトメーカー</h1>
+	<p>ユーザー定義エフェクトを作成するためのフォームです</p>
+	<p>各エフェクトの詳細は<a href="http://mtstdy.blog.fc2.com/blog-entry-27.html">masakaブログ</a>を参照してください</p>
+	<p>初期値ボタンについて、一部初期値が不明なパラメータは記入例を入力します</p>
+	<p>空欄にしたパラメータは省略します</p>
+	</div>
+	<h3>ms指定計算機</h3>
+		<p>
+			BPM
+			<input class="calc-input" id="calc-BPM" value="180">
+			, 単位長さ
+			<input class="calc-input" id="calc-length" value="1/16">
+			 = 
+			<input class="calc-input" id="calc-ms" value="83.333">
+			ms
+		</p>
+	<h3>FX or LASERの選択</h3>
+	<p>
+		<select id="FxFilter">
+			<option value="fx">FX</option>
+			<option value="filter">LASER</option>
+		</select>
+	</p>
+	<h3>エフェクトのタイプを選択</h3>
+	<p>
+		<select id="EffectType">
+			<option value="Retrigger">Retrigger</option>
+			<option value="Gate">Gate</option>
+			<option value="Flanger">Flanger</option>
+			<option value="PitchShift">PitchShift</option>
+			<option value="BitCrusher">BitCrusher</option>
+			<option value="Phaser">Phaser</option>
+			<option value="Wobble">Wobble</option>
+			<option value="TapeStop">TapeStop</option>
+			<option value="Echo">Echo</option>
+			<option value="SideChain">SideChain</option>
+			<option value="SwitchAudio">SwitchAudio</option>
+		</select>
+	</p>
+	<div id="Parameter">
+		<p data-effecttype="all">
+			エフェクト名:<input class="parameter-input" id="effectName" value="">
+			<button type="button" class="reset-button" data-param="effectName">初期値</button>
+			[必須]
+		</p>
+		<p data-effecttype="Retrigger">
+			updatePeriod=<input class="parameter-input" id="updatePeriod" value="">
+			<button type="button" class="reset-button" data-param="updatePeriod">初期値</button>
+			[LENGTH]
+		</p>
+		<p data-effecttype="Retrigger Gate Wobble Echo">
+			waveLength=<input class="parameter-input" id="waveLength" value="">
+			<button type="button" class="reset-button" data-param="waveLength">初期値</button>
+			[LENGTH]
+		</p>
+		<p data-effecttype="Retrigger Gate">
+			rate=<input class="parameter-input" id="rate" value="">
+			<button type="button" class="reset-button" data-param="rate">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="Retrigger Echo">
+			updateTrigger=<input class="parameter-input" id="updateTrigger" value="">
+			<button type="button" class="reset-button" data-param="updateTrigger">初期値</button>
+			[SWITCH]
+		</p>
+		<p data-effecttype="Flanger Phaser SideChain">
+			period=<input class="parameter-input" id="period" value="">
+			<button type="button" class="reset-button" data-param="period">初期値</button>
+			[LENGTH]
+		</p>
+		<p data-effecttype="Phaser">
+			stage=<input class="parameter-input" id="stage" value="">
+			<button type="button" class="reset-button" data-param="stage">初期値</button>
+			[INT]
+		</p>
+		<p data-effecttype="Phaser Wobble">
+			loFreq=<input class="parameter-input" id="loFreq" value="">
+			<button type="button" class="reset-button" data-param="loFreq">初期値</button>
+			[FREQ]
+		</p>
+		<p data-effecttype="Phaser Wobble">
+			hiFreq=<input class="parameter-input" id="hiFreq" value="">
+			<button type="button" class="reset-button" data-param="hiFreq">初期値</button>
+			[FREQ]
+		</p>
+		<p data-effecttype="Wobble">
+			Q=<input class="parameter-input" id="Q" value="">
+			<button type="button" class="reset-button" data-param="Q">初期値</button>
+			[FLOAT]
+		</p>
+		<p data-effecttype="Flanger">
+			delay=<input class="parameter-input" id="delay" value="">
+			<button type="button" class="reset-button" data-param="delay">初期値</button>
+			[SAMPLE]
+		</p>
+		<p data-effecttype="Flanger">
+			depth=<input class="parameter-input" id="depth" value="">
+			<button type="button" class="reset-button" data-param="depth">初期値</button>
+			[SAMPLE]
+		</p>
+		<p data-effecttype="Flanger Phaser">
+			feedback=<input class="parameter-input" id="feedback" value="">
+			<button type="button" class="reset-button" data-param="feedback">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="Flanger Phaser">
+			stereoWidth=<input class="parameter-input" id="stereoWidth" value="">
+			<button type="button" class="reset-button" data-param="stereoWidth">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="Flanger">
+			volume=<input class="parameter-input" id="volume" value="">
+			<button type="button" class="reset-button" data-param="volume">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="PitchShift">
+			pitch=<input class="parameter-input" id="pitch" value="">
+			<button type="button" class="reset-button" data-param="pitch">初期値</button>
+			[PITCH]
+		</p>
+		<p data-effecttype="PitchShift">
+			chunkSize=<input class="parameter-input" id="chunkSize" value="">
+			<button type="button" class="reset-button" data-param="chunkSize">初期値</button>
+			[SAMPLE]
+		</p>
+		<p data-effecttype="PitchShift">
+			overWrap=<input class="parameter-input" id="overWrap" value="">
+			<button type="button" class="reset-button" data-param="overWrap">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="BitCrusher">
+			reduction=<input class="parameter-input" id="reduction" value="">
+			<button type="button" class="reset-button" data-param="reduction">初期値</button>
+			[SAMPLE]
+		</p>
+		<p data-effecttype="Phaser">
+			hiCutGain=<input class="parameter-input" id="hiCutGain" value="">
+			<button type="button" class="reset-button" data-param="hiCutGain">初期値</button>
+			[dB]
+		</p>
+		<p data-effecttype="TapeStop">
+			speed=<input class="parameter-input" id="speed" value="">
+			<button type="button" class="reset-button" data-param="speed">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="TapeStop">
+			trigger=<input class="parameter-input" id="trigger" value="">
+			<button type="button" class="reset-button" data-param="trigger">初期値</button>
+			[SWITCH]
+		</p>
+		<p data-effecttype="Echo">
+			feedbackLevel=<input class="parameter-input" id="feedbackLevel" value="">
+			<button type="button" class="reset-button" data-param="feedbackLevel">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="Retrigger Gate Flanger PitchShift BitCrusher Phaser Wobble TapeStop Echo">
+			mix=<input class="parameter-input" id="mix" value="">
+			<button type="button" class="reset-button" data-param="mix">初期値</button>
+			[RATE]
+		</p>
+		<p data-effecttype="SideChain">
+			holdTime=<input class="parameter-input" id="holdTime" value="">
+			<button type="button" class="reset-button" data-param="holdTime">初期値</button>
+			[LENGTH]
+		</p>
+		<p data-effecttype="SideChain">
+			attackTime=<input class="parameter-input" id="attackTime" value="">
+			<button type="button" class="reset-button" data-param="attackTime">初期値</button>
+			[LENGTH]
+		</p>
+		<p data-effecttype="SideChain">
+			releaseTime=<input class="parameter-input" id="releaseTime" value="">
+			<button type="button" class="reset-button" data-param="releaseTime">初期値</button>
+			[LENGTH]
+		</p>
+		<p data-effecttype="SideChain">
+			ratio=<input class="parameter-input" id="ratio" value="">
+			<button type="button" class="reset-button" data-param="ratio">初期値</button>
+			[INT]
+		</p>
+		<p data-effecttype="SwitchAudio">
+			fileName=<input class="parameter-input" id="fileName" value="">
+			<button type="button" class="reset-button" data-param="fileName">初期値</button>
+			[FILENAME]
+		</p>
+	</div>
+	<p>
+		<button id="add-button">出力</button>
+	</p>
+	<h3>作成されたエフェクト</h3>
+	<p><textarea id="result-area" rows="8" cols="80"></textarea></p>
+
+
+
+
+
+	<h3>使用上の注意</h3>
+	<p>計算機では小数連以下も表示していますが、パラメータのms指定では整数のみ使用可能です。</p>
+	<p>FXエフェクトでエディタから直接指定されるパラメータは初期値が空欄になっています</p>
+	<p>それらのパラメータについて、LASERエフェクトでは初期値ボタンで記入例が入力されます</p>
+	<p>updatePeriod及びSideChainのperiodは例外的にs/ms単位が使用できません</p>
+	<!-- 外部JavaScriptファイルの読み込み -->
+	<script src="script.js"></script>
+
+	<footer>
+		<ul>
+			<li><a href="../index.html">back</a></li>
+		</ul>
+	</footer>
+</body>
+
+
+</html>
+
+
+
