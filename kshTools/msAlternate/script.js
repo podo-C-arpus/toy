@@ -97,7 +97,7 @@ document.getElementById('run-button').addEventListener('click', () => {
 						editorValue = parseInt(textLine.split(';')[1]);
 						editorValueFeedback = parseInt(textLine.split(';')[2]);
 						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `\r\nfx:msEcMnCn:waveLength=${msLength}ms\r\nfx:msEcMnCn:feedbackLevel=${editorValueFeedback}%\r\nfx:msEcMnCn:mix=100%\r\n`;
+						newText += `\r\nfx:msEcMnCn:updateTrigger=on\r\nfx:msEcMnCn:waveLength=${msLength}ms\r\nfx:msEcMnCn:feedbackLevel=${editorValueFeedback}%\r\nfx:msEcMnCn:mix=100%\r\n`;
 					} else {
 						newText += textLine + '\r\n'; // そのまま転記
 					}
@@ -136,7 +136,7 @@ document.getElementById('run-button').addEventListener('click', () => {
 						editorValue = parseInt(textLine.split(';')[1]);
 						editorValueFeedback = parseInt(textLine.split(';')[2]);
 						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `fx-r=\r\nfx:msEcMnCn:waveLength=${msLength}ms\r\nfx:msEcMnCn:feedbackLevel=${editorValueFeedback}%\r\nfx:msEcMnCn:mix=100%\r\n`;
+						newText += `fx-r=\r\nfx:msEcMnCn:updateTrigger=on\r\nfx:msEcMnCn:waveLength=${msLength}ms\r\nfx:msEcMnCn:feedbackLevel=${editorValueFeedback}%\r\nfx:msEcMnCn:mix=100%\r\n`;
 					} else {
 						newText += textLine + '\r\n'; // そのまま転記
 					}
