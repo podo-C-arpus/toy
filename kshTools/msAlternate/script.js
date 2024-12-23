@@ -28,6 +28,7 @@ document.getElementById('run-button').addEventListener('click', () => {
 	let originalBPM = 200;
 	let fxL = 'Dry';
 	let fxR = 'Dry';
+	let fxSide = 'l';
 
 	// ファイル名とテキストエリアの内容を取得
 	const fileName = document.querySelector('#fileName').textContent;
@@ -55,93 +56,89 @@ document.getElementById('run-button').addEventListener('click', () => {
 
 		} else if (textLine.startsWith('t=')) {
 		// t=の行
-			modify = true; // 変更すべきことを記憶
 			originalBPM = parseFloat(textLine.split('=')[1]);
 			newText += textLine + '\r\n'; // そのまま転記
 		} else if (fxLine.test(textLine)) {
 		//fxエフェクトを取得、始点を書き込む
 			if (line >= startLine && line <= endLine) {
 				// 適用範囲内
-				if (textLine.startsWith('fx-l')) {
-					if (fxL !== 'Dry') {
-						//FXエフェクト切り替わりの可能性を考慮して古いエフェクトを切る
-						newText += `ms${fxL}MnCn:mix=0%\r\n`;
-					} else {
-						//何もしない
-					}
-					if (fx_Re.test(textLine)) {
-						editorValue = parseInt(textLine.split(';')[1]);
-						fxL = 'Re';
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `fx-l=\r\nfx:msReMnCn:updateTrigger=on\r\nfx:msReMnCn:waveLength=${msLength}ms\r\nfx:msReMnCn:mix=100%\r\n`;
-					} else if (fx_Ga.test(textLine)) {
-						fxL = 'Ga';
-						editorValue = parseInt(textLine.split(';')[1]);
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `fx-l=\r\nfx:msGaMnCn:waveLength=${msLength}ms\r\nfx:msGaMnCn:mix=90%\r\n`;
-					} else if (fx_Fl.test(textLine)) {
-						fxL = 'Dry'; // mixは臨時命令しないためDryとして扱う
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / 0.5);
-						newText += `fx-l=msFlMnCn\r\nfx:msFlMnCn:period=${msLength}ms\r\n`;
-					} else if (fx_Ph.test(textLine)) {
-						fxL = 'Dry'; // mixは臨時命令しないためDryとして扱う
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / 2);
-						newText += `fx-l=msPhMnCn\r\nfx:msPhMnCn:period=${msLength}ms\r\n`;
-					} else if (fx_Wo.test(textLine)) {
-						fxL = 'Wo';
-						editorValue = parseInt(textLine.split(';')[1]);
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `\r\nfx:msWoMnCn:waveLength=${msLength}ms\r\nfx:msWoMnCn:mix=50%\r\n`;
-					} else if (fx_Ec.test(textLine)) {
-						fxL = 'Ec';
-						editorValue = parseInt(textLine.split(';')[1]);
-						editorValueFeedback = parseInt(textLine.split(';')[2]);
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `\r\nfx:msEcMnCn:updateTrigger=on\r\nfx:msEcMnCn:waveLength=${msLength}ms\r\nfx:msEcMnCn:feedbackLevel=${editorValueFeedback}%\r\nfx:msEcMnCn:mix=100%\r\n`;
-					} else {
-						newText += textLine + '\r\n'; // そのまま転記
-					}
-				} else if (textLine.startsWith('fx-r')) {
-					if (fxR !== 'Dry') {
-						//FXエフェクト切り替わりの可能性を考慮して古いエフェクトを切る
-						newText += `ms${fxR}MnCn:mix=0%\r\n`;
-					} else {
-						//何もしない
-					}
-					if (fx_Re.test(textLine)) {
-						fxR = 'Re';
-						editorValue = parseInt(textLine.split(';')[1]);
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `fx-r=\r\nfx:msReMnCn:updateTrigger=on\r\nfx:msReMnCn:waveLength=${msLength}ms\r\nfx:msReMnCn:mix=100%\r\n`;
-					} else if (fx_Ga.test(textLine)) {
-						fxR = 'Ga';
-						editorValue = parseInt(textLine.split(';')[1]);
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `fx-r=\r\nfx:msGaMnCn:waveLength=${msLength}ms\r\nfx:msGaMnCn:mix=90%\r\n`;
-					} else if (fx_Fl.test(textLine)) {
-						fxR = 'Dry'; // mixは臨時命令しないためDryとして扱う
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / 0.5);
-						newText += `fx-r=msFlMnCn\r\nfx:msFlMnCn:period=${msLength}ms\r\n`;
-					} else if (fx_Ph.test(textLine)) {
-						fxR = 'Dry'; // mixは臨時命令しないためDryとして扱う
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / 2);
-						newText += `fx-r=msPhMnCn\r\nfx:msPhMnCn:period=${msLength}ms\r\n`;
-					} else if (fx_Wo.test(textLine)) {
-						fxR = 'Wo';
-						editorValue = parseInt(textLine.split(';')[1]);
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `fx-r=\r\nfx:msWoMnCn:waveLength=${msLength}ms\r\nfx:msWoMnCn:mix=50%\r\n`;
-					} else if (fx_Ec.test(textLine)) {
-						fxR = 'Ec';
-						editorValue = parseInt(textLine.split(';')[1]);
-						editorValueFeedback = parseInt(textLine.split(';')[2]);
-						msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
-						newText += `fx-r=\r\nfx:msEcMnCn:updateTrigger=on\r\nfx:msEcMnCn:waveLength=${msLength}ms\r\nfx:msEcMnCn:feedbackLevel=${editorValueFeedback}%\r\nfx:msEcMnCn:mix=100%\r\n`;
-					} else {
-						newText += textLine + '\r\n'; // そのまま転記
-					}
+				fxSide = textLine[3];
+				if (fxSide === 'l' && fxL !== 'Dry') {
+					//FXエフェクト切り替わりの可能性を考慮して古いエフェクトを切る
+					newText += `fx:ms${fxL}MnCn:mix=0%\r\n`;
+				} else if (fxSide === 'r' && fxR !== 'Dry') {
+					//FXエフェクト切り替わりの可能性を考慮して古いエフェクトを切る
+					newText += `fx:ms${fxR}MnCn:mix=0%\r\n`;
 				} else {
 					//何もしない
+				}
+				if (fx_Re.test(textLine)) {
+					editorValue = parseInt(textLine.split(';')[1]);
+					if (fxSide === 'l') {
+						fxL = 'Re';
+					} else if (fxSide === 'r') {
+						fxR = 'Re';
+					} else {
+						// このelseは発生しない
+					}
+					msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
+					newText += `fx-${fxSide}=\r\nfx:msReMnCn:updateTrigger=on\r\nfx:msReMnCn:waveLength=${msLength}ms\r\nfx:msReMnCn:mix=100%\r\n`;
+				} else if (fx_Ga.test(textLine)) {
+					if (fxSide === 'l') {
+						fxL = 'Ga';
+					} else if (fxSide === 'r') {
+						fxR = 'Ga';
+					} else {
+						// このelseは発生しない
+					}
+					editorValue = parseInt(textLine.split(';')[1]);
+					msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
+					newText += `fx-${fxSide}=\r\nfx:msGaMnCn:waveLength=${msLength}ms\r\nfx:msGaMnCn:mix=90%\r\n`;
+				} else if (fx_Fl.test(textLine)) {
+					if (fxSide === 'l') {
+						fxL = 'Dry';
+					} else if (fxSide === 'r') {
+						fxR = 'Dry';
+					} else {
+						// このelseは発生しない
+					} // mixの臨時命令をしないためDryとして扱う
+					msLength = Math.round(1000 * 60 * 4 / originalBPM / 0.5);
+					newText += `fx-${fxSide}=msFlMnCn\r\nfx:msFlMnCn:period=${msLength}ms\r\n`;
+				} else if (fx_Ph.test(textLine)) {
+					if (fxSide === 'l') {
+						fxL = 'Dry';
+					} else if (fxSide === 'r') {
+						fxR = 'Dry';
+					} else {
+						// このelseは発生しない
+					} // mixの臨時命令をしないためDryとして扱う
+					msLength = Math.round(1000 * 60 * 4 / originalBPM / 2);
+					newText += `fx-${fxSide}=msPhMnCn\r\nfx:msPhMnCn:period=${msLength}ms\r\n`;
+				} else if (fx_Wo.test(textLine)) {
+					if (fxSide === 'l') {
+						fxL = 'Wo';
+					} else if (fxSide === 'r') {
+						fxR = 'Wo';
+					} else {
+						// このelseは発生しない
+					}
+					editorValue = parseInt(textLine.split(';')[1]);
+					msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
+					newText += `fx-${fxSide}=\r\nfx:msWoMnCn:waveLength=${msLength}ms\r\nfx:msWoMnCn:mix=50%\r\n`;
+				} else if (fx_Ec.test(textLine)) {
+					if (fxSide === 'l') {
+						fxL = 'Ec';
+					} else if (fxSide === 'r') {
+						fxR = 'Ec';
+					} else {
+						// このelseは発生しない
+					}
+					editorValue = parseInt(textLine.split(';')[1]);
+					editorValueFeedback = parseInt(textLine.split(';')[2]);
+					msLength = Math.round(1000 * 60 * 4 / originalBPM / editorValue);
+					newText += `fx-${fxSide}=\r\nfx:msEcMnCn:updateTrigger=on\r\nfx:msEcMnCn:waveLength=${msLength}ms\r\nfx:msEcMnCn:feedbackLevel=${editorValueFeedback}%\r\nfx:msEcMnCn:mix=100%\r\n`;
+				} else {
+					newText += textLine + '\r\n'; // そのまま転記
 				}
 			} else {
 				// 適用範囲外
@@ -162,17 +159,17 @@ document.getElementById('run-button').addEventListener('click', () => {
 			newText += textLine + '\r\n'; // そのまま転記
 		} else {
 			newText += textLine + '\r\n'; // そのまま転記
-			if (textLine.startsWith('#define_fx msReMnCn')) {
+			if (textLine.startsWith('#define_fx msReMnCn type')) {
 				defineRe = true;
-			} else if (textLine.startsWith('#define_fx msGaMnCn')) {
+			} else if (textLine.startsWith('#define_fx msGaMnCn type')) {
 				defineGa = true;
-			} else if (textLine.startsWith('#define_fx msFlMnCn')) {
+			} else if (textLine.startsWith('#define_fx msFlMnCn type')) {
 				defineFl = true;
-			} else if (textLine.startsWith('#define_fx msPhMnCn')) {
+			} else if (textLine.startsWith('#define_fx msPhMnCn type')) {
 				definePh = true;
-			} else if (textLine.startsWith('#define_fx msWoMnCn')) {
+			} else if (textLine.startsWith('#define_fx msWoMnCn type')) {
 				defineWo = true;
-			} else if (textLine.startsWith('#define_fx msEcMnCn')) {
+			} else if (textLine.startsWith('#define_fx msEcMnCn type')) {
 				defineEc = true;
 			}
 		}
