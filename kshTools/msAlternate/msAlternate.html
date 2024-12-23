@@ -11,6 +11,7 @@
 	<h2>k-shoot mania Tools</h2>
 	<h1>msエフェクト自動変換</h1>
 	<p>editorからデフォルトで設定できるRetrriger, Gate, Flanger, Phaser, Wobble, EchoのFXエフェクトをms指定に書き換えます</p>
+	<p>RetrrigerのupdateTriggerはFXの先頭になります</p>
 	<p>SideChainはms指定が不可能なので非対応です</p>
 	<p>手動コンスタントと併用する場合は必ず先にこちらを適用してください</p></p>
 	<h3>適用範囲</h3>
@@ -68,17 +69,30 @@
 	</p>
 	<script src="script.js"></script>
 
-	<h2>注意:BPM変化は小節線上である必要があります</h2>
-	<p>いつかちゃんと書く</p>
+	<h2>注意:Retrrigerの参照元音源が正しく変換できません</h2>
+	<p>updateTriggerはデフォルトでは1/2小節単位にありますが、私の技術的に難解なので、代わりにFXの先頭に設置しています</p>
+	<p>これに付随して、updatePeriodは0(自動更新無効)にしています</p>
+	<p>修正が必要な場合はテキストエディタから「fx:msReMnCn:updateTrigger=on」を検索し、適切な場所に移動、加筆してください</p>
 	<h3>誤差について</h3>
-	<p>仕様上、どうしても誤差が生じるので注意してください</p>
-	<p>いつかちゃんと説明を書く</p>
+	<p>ms単位に四捨五入を行っているため誤差が出ます。長いFXでは誤差の蓄積に注意してください</p>
+	<p>誤差は１周で最大0.5msです。Re32を１小節続けて鳴らすとBPMによっては16msの誤差が出ます</p>
+	<h2>ユーザー定義エフェクト</h2>
+	<p>未定義の場合、以下のユーザー定義エフェクトを加筆します</p>
+	<p>あらかじめ定義しておくことも可能ですが、自動変換はデフォルトのエフェクトのみが対象です</p>
+	<p>#define_fx msReMnCn type=Retrigger;updatePeriod=0;waveLength=1/4;rate=70%;updateTrigger=off;mix=0%>100%</p>
+	<p>#define_fx msGaMnCn type=Gate;waveLength=1/4;rate=60%;mix=0%>90%</p>
+	<p>#define_fx msFlMnCn type=Flanger;period=2.0;delay=30samples;depth=45samples;feedback=60%;stereoWidth=0%;volume=75%;mix=0%>80%</p>
+	<p>#define_fx msPhMnCn type=Phaser;period=1/2;stage=6;loFreq=1500Hz;hiFreq=20000Hz;Q=0.707;feedback=35%;stereoWidth=75%;hiCutGain=-8.9dB;mix=0%>50%</p>
+	<p>#define_fx msWoMnCn type=Wobble;waveLength=1/12;loFreq=500Hz;hiFreq=20000Hz;Q=1.414;mix=0%>50%</p>
+	<p>#define_fx msEcMnCn type=Echo;updatePeriod=0;waveLength=1/4;updateTrigger=off>on;feedbackLevel=100%;mix=0%>100%</p>
+	<p>また、適用後のファイル末尾に追加されているこれら定義を変更することで本ツールで加工されたエフェクト全体を調整できます</p>
+	<p>臨時命令で使用しているwaveLength, updateTrigger, period, feedbackLevel, mix以外の値は変更可能です</p>
 	<footer>
 		<ul>
 			<li><a href="../kshTools.html">back</a></li>
 		</ul>
 	</footer>
-	<p>最終更新 2024/09/16</p>
+	<p>最終更新 2024/12/23</p>
 </body>
 
 
