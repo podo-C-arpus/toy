@@ -48,6 +48,14 @@ document.getElementById('run-button').addEventListener('click', () => {
 					zoomSide = parseInt(textLine.split('=')[1], 10);
 					centerSplit = Math.round(zoomSide * -1 * bairitsu);
 					newText += `zoom_side=${zoomSide}\r\ncenter_split=${centerSplit}\r\n`; //新たなテキストを記入
+				} else if (sentakuShi == 102) { //正のcenter_splitを追記 レーン半分をデフォルト位置に固定
+					zoomSide = parseInt(textLine.split('=')[1], 10);
+					centerSplit = Math.round(Math.abs(zoomSide * bairitsu));
+					newText += `zoom_side=${zoomSide}\r\ncenter_split=${centerSplit}\r\n`; //新たなテキストを記入
+				} else if (sentakuShi == 103) { //負のcenter_splitを追記 レーン半分をデフォルト位置に固定
+					zoomSide = parseInt(textLine.split('=')[1], 10);
+					centerSplit = Math.round(-1 * Math.abs(zoomSide * bairitsu));
+					newText += `zoom_side=${zoomSide}\r\ncenter_split=${centerSplit}\r\n`; //新たなテキストを記入
 				} else if (sentakuShi == 200) { //zoom_sideの正負を反転
 					zoomSide = parseInt(textLine.split('=')[1], 10);
 					zoomSide = Math.round(zoomSide * -1);
