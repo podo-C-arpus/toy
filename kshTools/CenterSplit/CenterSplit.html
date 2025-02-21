@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>kshCenterSplit</title>
-	<link rel="stylesheet" href="style.css"
+	<link rel="stylesheet" href="z2c_style.css"
 </head>
 
 <body>
@@ -11,7 +11,7 @@
 	<h2>k-shoot mania Tools</h2>
 	<h1>zoom_sideからcenter_splitを生成</h1>
 	<p>zoom_sideの値を参照してcenter_splitを自動で生成します。</p>
-	<p>(注)kshファイルではzoom_sideとcenter_splitでスケールが4倍異なります。このツールでは自動で補正しています。</p>
+	<p>(注)kshファイルではzoom_sideとcenter_splitでスケールが異なります。このツールでは自動で補正します。</p>
 	<h3>適用範囲</h3>
 	<div id="rangeLine">
 		<p>
@@ -31,6 +31,14 @@
 			<option value="201">center_splitの正負を反転</option>
 			<option value="300">zoom_sideを削除</option>
 			<option value="301">center_splitを削除</option>
+		</select>
+	</p>
+	<h3>スケールの補正倍率</h3>
+	<p>
+		<select id="bairitsu">
+			<option value="4.347826086956522">23:100(厳密な変換)</option>
+			<option value="4.000000000000000">25:100(4倍近似変換)</option>
+			<option value="1.000000000000000">100:100(補正しない)</option>
 		</select>
 	</p>
 
@@ -79,14 +87,14 @@
 	<p>
 		<button id="run-button">実行</button>
 	</p>
-	<script src="script.js"></script>
+	<script src="z2c_script.js"></script>
 
 	<footer>
 		<ul>
 			<li><a href="../kshTools.html">back</a></li>
 		</ul>
 	</footer>
-	<p>最終更新 2024/09/12</p>
+	<p>最終更新 2025/02/21</p>
 </body>
 
 
