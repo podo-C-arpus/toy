@@ -10,7 +10,7 @@ p {
     padding-left: 15px;
 }
 
-#rangeLine, #sentakuShi {
+#rangeLine, #sentakuShi , #bairitsu{
     transform: scale(1.2); /* 要素全体のスケーリング */
     transform-origin: top left;
     font-size: 120%; /* テキストのサイズを120%に設定 */
