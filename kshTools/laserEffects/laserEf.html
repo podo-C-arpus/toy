@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Fx-Laserエフェクト変換</title>
+	<link rel="stylesheet" href="laserEf_style.css"
+</head>
+
+<body>
+	<h1>Arpusのおもちゃ箱</h1>
+	<h2>k-shoot mania Tools</h2>
+	<h1>Fx-Laserエフェクト変換</h1>
+	<p>Fxエフェクトを元に、Laserエフェクトの臨時命令に変換します。</p>
+	<p>SwitchAudioエフェクトは非対応です</p>
+	<p>Laser位置によってエフェクトのかかり方を変化させる設定を加筆するオマケ機能があります</p>
+	<h3>適用範囲</h3>
+	<div id="rangeLine">
+		<p>
+			<input id="startLine" type="number" value="1">
+			小節から
+			<input id="endLine" type="number" value="200">
+			小節まで
+		</p>
+	</div>
+
+	<h3>エフェクト先頭に updateTrigger=on を記載</h3>
+	<p>本来はRetriggerの更新位置はエフェクト先頭と必ずしも一致していないことに注意</p>
+	<p>
+		<select id="headTrigger">
+			<option value="always">常に記載する</option>
+			<option value="left">Fx_Lの場合のみ記載する</option>
+			<option value="never">常に記載しない</option>
+		</select>
+	</p>
+
+	<h3>editorから指定可能なパラメータの扱い</h3>
+	<p>
+		<select id="valuePriority">
+			<option value="editor">editorでの設定を優先</option>
+			<option value="uneditable">editorで書けない定義は上書きしない</option>
+			<option value="userDefinition">ユーザー定義エフェクトの定義を優先</option>
+		</select>
+	</p>
+
+	<h3>mixの設定</h3>
+	<p>Sidecainではmixの代わりにratioを用いています</p>
+	<p>
+		<select id="mixScale">
+			<option value="userDefinition">ユーザー定義エフェクトの設定に従う</option>
+			<option value="weaken">弱め(定義値の60%)に変更する</option>
+			<option value="liner">0から定義値の間で変化させる</option>
+		</select>
+	</p>
+
+	<h3>Laser位置依存でエフェクトの音を変える</h3>
+	<p>もとから0%>0%-100%のように範囲指定しているものは上書きしない</p>
+	<p>
+		<select id="linerValue">
+			<option value="userDefinition">ユーザー定義エフェクトの設定に従う</option>
+			<option value="arpus1">おまかせ設定1</option>
+			<option value="arpus2">おまかせ設定2</option>
+		</select>
+	</p>
+
+	<p></p>
+	<div id="inputFile">
+		<p id="dropArea">ここにファイルをドロップしてください</p>
+	</div>
+	<p id="fileName">file name</p>
+	<textarea id="textArea" >プレビュー</textarea>
+	
+	<script>
+	// ドロップエリア、テキストエリア、ファイル名表示エリアの要素を取得
+	const dropArea = document.getElementById('dropArea');
+	const textArea = document.getElementById('textArea');
+	const fileNameElement = document.getElementById('fileName');
+	
+	// ドロップエリアにドラッグオーバーしたときのイベントリスナー
+	dropArea.addEventListener('dragover', (event) => {
+		event.preventDefault();
+		dropArea.classList.add('dragover'); // ドラッグオーバー時のスタイルを適用
+	});
+	
+	// ドロップエリアからドラッグアウトしたときのイベントリスナー
+	dropArea.addEventListener('dragleave', () => {
+		dropArea.classList.remove('dragover'); // ドラッグオーバー時のスタイルを解除
+	});
+	
+	// ファイルをドロップしたときのイベントリスナー
+	dropArea.addEventListener('drop', (event) => {
+		event.preventDefault();
+		dropArea.classList.remove('dragover');
+	
+		const file = event.dataTransfer.files[0]; // ドロップされた最初のファイルを取得
+		const reader = new FileReader(); // FileReaderオブジェクトを作成
+	
+		// ファイルを読み込んだ後の処理
+		reader.onload = () => {
+			textArea.value = reader.result; // テキストエリアに読み込んだ内容を表示
+			fileNameElement.textContent = file.name; // ファイル名を表示
+		};
+	
+		// ファイルをテキストとして読み込む
+		reader.readAsText(file);
+	});
+	</script>
+	
+	<p>
+		<button id="run-button">実行</button>
+	</p>
+	<script src="laserEf_script.js"></script>
+
+	<h2>注意:Retrrigerの参照元音源が正しく変換できません</h2>
+	<p>updateTriggerはデフォルトでは1/2小節単位にありますが、私の技術的に難解なので、代わりにFXの先頭に設置しています</p>
+	<p>これに付随して、updatePeriodは0(自動更新無効)にしています</p>
+	<footer>
+		<ul>
+			<li><a href="../kshTools.html">back</a></li>
+		</ul>
+	</footer>
+	<p>最終更新 2025/04/30</p>
+</body>
+
+
+</html>
