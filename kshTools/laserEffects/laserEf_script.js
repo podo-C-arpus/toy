@@ -1050,7 +1050,7 @@ document.getElementById('run-button').addEventListener('click', () => {
 	// ファイルを1行ずつ編集する
 	for (let i = 0; i < lines.length; i++) {
 		if (lines[i] === "--") {
-			measureCount = measureCount + 1;
+			measureCount += 1;
 		} else {
 			// 小節数を数えるだけなのでelseでやることはない
 		}
@@ -1128,19 +1128,6 @@ document.getElementById('run-button').addEventListener('click', () => {
 			}
 		} 
 		else {
-			// 実行範囲外でも小節は数えるし、bpmは取得する
-			if (lines[i] === "--") {
-				measureCount = measureCount + 1;
-			} else {
-				// 小節数を数えるだけなのでelseでやることはない
-			}
-	
-			if (lines[i].startsWith("t=")) {
-				originalBPM = parseFloat(lines[i].split("=")[1]);
-			} else {
-				// BPMを取得するだけなのでelseでやることはない
-			}
-			
 			if (notesLine.test(lines[i])) { // ノーツが来たので必要に応じてmix0を生成
 				// ノーツが来たので必要に応じてmix0を生成
 				if (lines[i].charAt[5] !== "1" && fxL !== "") {
