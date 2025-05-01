@@ -143,7 +143,8 @@ footer a:hover {
 
 .mixscale-selector {
   flex: 1 1 180px;
-  min-width: 160px;
+  max-width:180px;
+  min-width: 180px;
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 12px;
@@ -171,8 +172,9 @@ footer a:hover {
 }
 
 .global-select-box {
-  flex: 1 1 220px;
-  min-width: 200px;
+  flex: 1 1 300px;
+  max-width: 475px;
+  min-width: 170px;
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 12px;
