@@ -6,24 +6,30 @@
 }
 
 p {
-    position: relative;
-    padding-left: 15px;
+  position: relative;
+  padding-left: 15px;
 }
 
-#rangeLine, #inputBPM {
-    transform: scale(1.2); /* 要素全体のスケーリング */
-    transform-origin: top left;
-    font-size: 120%; /* テキストのサイズを120%に設定 */
-    margin-bottom: 20px;
+#rangeLine {
+  transform: scale(1.2);
+  transform-origin: top left;
+  font-size: 150%;
+  margin-bottom: 20px;
 }
 
-#startLine, #endLine, #standardBPM {
-    width: 80px;
+#startLine, #endLine {
+  width: 100px;
+  font-size: 22px;
+  padding: 8px 12px;
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid #999;
 }
+
 
 #inputFile {
   position: relative;
-  padding: 20px 0; /* 上下の padding を少なくする */
+  padding: 20px 0;
 }
 
 #dropArea {
@@ -42,57 +48,149 @@ p {
 
 #fileName {
   text-align: left;
-  margin: 20px 0; /* 上部にスペースを追加 */
-  margin-bottom: 0px; /* dropArea との間に空白を追加 */
+  margin: 20px 0;
+  margin-bottom: 0px;
 }
 
 #textArea {
   width: 500px;
-  height: 150px; /* 高さを増やしてみる */
+  height: 150px;
   padding: 10px;
   text-align: left;
-  margin-top: 10px; /* 上部にマージンを追加 */
+  margin-top: 10px;
+  font-family: monospace;
 }
 
 #run-button {
-    font-size: 18px; /* フォントサイズを大きくする */
-    padding: 10px 20px; /* 内側の余白を大きくする */
-    width: 150px; /* ボタンの幅を指定する（必要に応じて調整） */
-    height: 50px; /* ボタンの高さを指定する（必要に応じて調整） */
-    border: none; /* デフォルトのボーダーを削除する */
-    border-radius: 5px; /* ボタンの角を丸くする（オプション） */
-    background-color: #4CAF50; /* ボタンの背景色 */
-    color: white; /* ボタンの文字色 */
-    cursor: pointer; /* ボタンにカーソルを合わせるとポインターが表示されるようにする */
-    font-weight: bold; /* 文字を太字にする */
-    transition: background-color 0.3s; /* ホバー時の背景色変化にアニメーションを追加 */
-	margin: 10px 0; /* ボタンの上下に 10px の余白を追加 */
+  font-size: 18px;
+  padding: 10px 20px;
+  width: 150px;
+  height: 50px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  margin: 10px 0;
 }
 
 #run-button:hover {
-    background-color: #45a049; /* ホバー時の背景色 */
+  background-color: #45a049;
 }
 
 footer ul {
-    list-style-type: none; /* リストマーカーを削除 */
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 }
 
 footer li {
-    margin: 0;
+  margin: 0;
 }
 
 footer a {
-    font-size: 15px; /* フォントサイズを設定 */
-    padding: 5px 10px; /* パディングを設定 */
-    display: inline-block; /* サイズを反映させるためにインラインブロックを使用 */
-    text-decoration: none; /* 下線を削除 */
-    color: #000; /* テキストカラーを設定（必要に応じて変更） */
-    border: 2px solid #000; /* ボーダーを追加（必要に応じて変更） */
-    border-radius: 5px; /* 角を丸くする */
-    background-color: #f0f0f0; /* 背景色を設定（必要に応じて変更） */
+  font-size: 15px;
+  padding: 5px 10px;
+  display: inline-block;
+  text-decoration: none;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 5px;
+  background-color: #f0f0f0;
 }
 
 footer a:hover {
-    background-color: #ddd; /* ホバー時の背景色 */
+  background-color: #ddd;
+}
+
+/* linerValue 選択 UI */
+.liner-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.liner-selector {
+  flex: 1 1 220px;
+  min-width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 12px;
+  background-color: #f9f9f9;
+}
+
+.liner-selector label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.liner-selector select {
+  width: 100%;
+  font-size: 16px;
+  padding: 6px;
+}
+
+/* mixScale 選択 UI */
+.mixscale-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.mixscale-selector {
+  flex: 1 1 180px;
+  min-width: 160px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 12px;
+  background-color: #f9f9f9;
+}
+
+.mixscale-selector label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.mixscale-selector select {
+  width: 100%;
+  font-size: 16px;
+  padding: 6px;
+}
+
+/* グローバル設定選択 UI */
+.global-select-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.global-select-box {
+  flex: 1 1 220px;
+  min-width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 12px;
+  background-color: #f4f4f4;
+}
+
+.global-select-box label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.global-select-box select {
+  width: 100%;
+  font-size: 16px;
+  padding: 6px;
+}
+
+#linerContainer {
+  display: none;
 }

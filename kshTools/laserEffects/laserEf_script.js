@@ -143,9 +143,9 @@ let headTrigger = "always"; // Retrigger等の先頭にupdateTriggerを記載す
 let valuePriority = "editor"; //fxロングのeditorから指定可能なパラメータをどう扱うのか
 	// "editor":editor指定値を優先, "uneditable":editor指定値を参照するがms指定や範囲指定等editor定義不可な値は上書きしない, "userDefinition":ユーザー定義値をそのまま使う
 let mixScale = "userDefinition"; //mixの定義値をどうするか(元から変化する設定は上書きしない)
-	//"userDefinition": ユーザー定義値をそのまま使う, "weaken": mixはユーザー定義値の60%に弱める, "liner": mixを「0<0-定義値」にする,
+	//"userDefinition": ユーザー定義値をそのまま使う, "weaken": mixは定義値の66.7%程度に弱める, "slightly":mixは定義値の33.3%程度に弱める, "hundred":100%
 let linerValue = "userDefinition"; //0<100を0<0-100にするみたいな加工を勝手にやる機能
-	//"userDefinition": ユーザー定義値をそのまま使う, "arpus1": おすすめ定義1, "arpus2": おすすめ定義2 
+	//"userDefinition": ユーザー定義値をそのまま使う, "proposal": おすすめ定義1, "dynamic": おすすめ定義2 
 
 let audio_effect = { // これはksonでエフェクトが格納される実例
 	"fx": {
@@ -315,37 +315,38 @@ function getDefValue(key, currentDef) {
 
 
 
-
-
 function makeMix(fx_name, currentDef, mixScale) { // mixパラメータを整形する
 	let mix = getDefValue("mix", currentDef);
-	let order = `filter:AtLsr_${fx_name}:mix=0%>`;
+	let order = `filter:AtLsr_${fx_name}:mix=`;
 	mix = mix.slice(mix.indexOf(">") + 1); // >があればそれ以降を使用
+	mix = mix.slice(mix.indexOf("-") + 1); // -があればそれ以降を使用
 
-	if (mix.includes("-")) {
-		order += mix;
-	} else {
-		switch (mixScale) {
-			case "userDefinition":
-				order += mix;
-				break;
-			case "weaken":
-				let mixValue = parseInt(mix);
-				if (isNaN(mixValue)) {
-					console.warn("mixが数値ではありません");
-					return order;
-				}
-				mixValue = Math.round(mixValue * 0.6);
-				order += `${mixValue}%`;
-				break;
-			case "liner":
-				order += `0%-${mix}`;
-				break;
-			default:
-				console.log("不明なmixScale");
-				break;
-		}
+	let mixValue = parseInt(mix);
+	switch (mixScale) {
+		case "userDefinition":
+			order += mix;
+			break;
+		case "weaken":
+			if (isNaN(mixValue)) {
+				console.warn("mixが数値ではありません");
+				return order;
+			}
+			mixValue = Math.round(mixValue * 2 / 3);
+			order += `${mixValue}%`;
+			break;
+		case "slightly":
+			mixValue = Math.round(mixValue * 1 / 3);
+			order += `${mixValue}%`;
+			break;
+		case "hundred":
+			mixValue = 100;
+			order += `${mixValue}%`;
+			break;
+		default:
+			console.log("不明なmixScale");
+			break;
 	}
+	
 	return order;
 }
 
@@ -353,30 +354,37 @@ function makeRatio(fx_name, currentDef, mixScale) { // ratioパラメータを�
 	let ratio = getDefValue("ratio", currentDef);
 	let order = `filter:AtLsr_${fx_name}:ratio=1>`;
 	ratio = ratio.slice(ratio.indexOf(">") + 1); // >があればそれ以降を使用
+	ratio = ratio.slice(ratio.indexOf("-") + 1); // -があればそれ以降を使用
 
-	if (ratio.includes("-")) {
-		order += ratio;
-	} else {
-		switch (mixScale) {
-			case "userDefinition":
-				order += ratio;
-				break;
-			case "weaken":
-				let ratioValue = parseInt(ratio);
-				if (isNaN(ratioValue)) {
-					console.warn("ratioが数値ではありません");
-					return order;
-				}
-				ratioValue = Math.round(ratioValue * 0.6);
-				order += `${ratioValue}`;
-				break;
-			case "liner":
-				order += `1-${ratio}`;
-				break;
-			default:
-				console.log("不明なmixScale (ratio用)");
-				break;
-		}
+
+	let ratioValue = parseInt(ratio);
+	switch (mixScale) {
+		case "userDefinition":
+			order += ratio;
+			break;
+		case "weaken":
+			if (isNaN(ratioValue)) {
+				console.warn("ratioが数値ではありません");
+				return order;
+			}
+			ratioValue = Math.round(ratioValue * 2 / 3);
+			order += `${ratioValue}`;
+			break;
+		case "slightly":
+			if (isNaN(ratioValue)) {
+				console.warn("ratioが数値ではありません");
+				return order;
+			}
+			ratioValue = Math.round(ratioValue * 1 / 3);
+			order += `${ratioValue}`;
+			break;
+		case "hundred":
+			ratioValue = Math.min(50, Math.round(ratioValue * 3.33)); // 100%の代わりに3.33倍強い圧縮
+			order += `${ratioValue}`;
+			break;
+		default:
+			console.log("不明なmixScale (ratio用)");
+			break;
 	}
 	return order;
 }
@@ -400,31 +408,45 @@ function makeUpdateTrigger(fx_name, fx_side, headTrigger) { // updateTriggerの�
 }
 
 function makeWaveLength(fx_name, currentDef, editorValue, valuePriority) { // waveLengthパラメータを生成する
+	let lengthDef = getDefValue("waveLength", currentDef);
+	lengthDef = lengthDef.slice(lengthDef.indexOf(">") + 1); // >以降を使用
+	if (lengthDef.includes("-")) {
+		// 範囲指定は上書きしない
+		return "";
+	}
 	switch (valuePriority) {
 		case "editor":
-			return `filter:AtLsr_${fx_name}:waveLength=1/${editorValue[0]}\r\n`;
+			lengthDef = `1/${editorValue[0]}`;
+			return `filter:AtLsr_${fx_name}:waveLength=${lengthDef}\r\n`;
 		case "uneditable":
-			let waveLength = getDefValue("waveLength", currentDef);
-			if (waveLength.includes("s")) {
-				return `filter:AtLsr_${fx_name}:waveLength=${waveLength}\r\n`;
+			if (lengthDef.includes("s")) {
+				// s,msは上書きしない
+				return "";
+			} else if (lengthDef.includes("/")) {
+				// 分数表記ならeditor準拠で上書き
+				lengthDef = `1/${editorValue[0]}`;
+				return `filter:AtLsr_${fx_name}:waveLength=${Math.round(length_ms)}ms\r\n`;
 			} else {
-				return `filter:AtLsr_${fx_name}:waveLength=1/${editorValue[0]}\r\n`;
+				// 整数、小数は上書きしない
+				return "";
 			}
+			break;
 		case "userDefinition":
-			let waveLengthDef = getDefValue("waveLength", currentDef);
-			return `filter:AtLsr_${fx_name}:waveLength=${waveLengthDef}\r\n`;
+			// 上書きしない
+			return "";
+			break;
 		default:
 			console.log("不明なvaluePriority");
-			return "";
+			break;
 	}
 }
 
-function makeRate(fx_name, key, currentDef, multiplier) {
+function makeRate(fx_name, key, currentDef) {
 	let rateDef = getDefValue(key, currentDef);
 	rateDef = rateDef.slice(rateDef.indexOf(">") + 1); // > があればそれ以降を使用
 
 	if (rateDef.includes("-")) {
-		return `filter:AtLsr_${fx_name}:${key}=${rateDef}\r\n`;
+		return "";
 	}
 
 	let rate = parseInt(rateDef);
@@ -532,8 +554,8 @@ function makeLength(fx_name, key, currentDef, multiplier) {
 		} else {
 			const denom = parseInt(lengthDef.split("/")[1]);
 	
-			const denom_home = Math.round(denominator * multiplier);
-			const denom_far = Math.round(denominator / multiplier);
+			const denom_home = Math.round(denom * (multiplier ** 0.5));
+			const denom_far = Math.round(denom / multiplier);
 	
 			return `filter:AtLsr_${fx_name}:${key}=1/${denom_home}-1/${denom_far}\r\n`;
 		}
@@ -607,9 +629,13 @@ function makeFloat(fx_name, key, currentDef, multiplier, range) {
 	return `filter:AtLsr_${fx_name}:${key}=${value_home}-${value_far}\r\n`;
 }
 
-function makeFeedbackLevel(fx_name, currentDef, editorValue, valuePriority, linerValue) {
+function makeFeedbackLevel(fx_name, currentDef, editorValue, valuePriority, multiplier) {
 	let feedbackDef = getDefValue("feedbackLevel", currentDef);
-	feedbackDef = feedbackDef.slice(feedbackDef.indexOf(">") + 1); // ←ここ修正！
+	feedbackDef = feedbackDef.slice(feedbackDef.indexOf(">") + 1);
+	if (feedbackDef.includes("-")) {
+		// 範囲指定はそのまま
+		return "";
+	}
 
 	let feedbackValue;
 	switch (valuePriority) {
@@ -620,69 +646,144 @@ function makeFeedbackLevel(fx_name, currentDef, editorValue, valuePriority, line
 		case "uneditable":
 			if (feedbackDef.includes("-")) {
 				// 範囲指定はそのまま
+				return "";
 			} else {
-				feedbackValue = parseFloat(editorValue[1]);
+				// editor定義値を記入
+				return `filter:AtLsr_${fx_name}:feedbackLevel=${feedbackDef}\r\n`;
 			}
 			break;
 
 		case "userDefinition":
-			feedbackValue = parseFloat(feedbackDef);
+				// 範囲指定はそのまま
+				return "";
 			break;
 
 		default:
 			console.warn("不明なvaluePriority (makeFeedbackLevel)");
 			return "";
 	}
+}
 
-	if (feedbackDef.includes("-")) {
+function makePitch(fx_name, currentDef, editorValue, valuePriority, multiplier) {
+	let pitchDef = getDefValue("pitch", currentDef);
+	pitchDef = pitchDef.slice(pitchDef.indexOf(">") + 1);
+	if (pitchDef.includes("-")) {
 		// 範囲指定はそのまま
-		return `filter:AtLsr_${fx_name}:feedbackLevel=${feedbackDef}\r\n`;
+		return "";
 	}
 
-	let multiplier = 1;
-	let feedbackNormalized = feedbackValue / 100;
+	let pitchValue;
+	switch (valuePriority) {
+		case "editor":
+			pitchValue = parseFloat(editorValue[1]);
+			break;
 
-	switch (linerValue) {
+		case "uneditable":
+			if (pitchDef.includes("-")) {
+				// 範囲指定はそのまま
+				return "";
+			} else {
+				// editor定義値を記入
+				return `filter:AtLsr_${fx_name}:pitch=${pitchDef}\r\n`;
+			}
+			break;
+
 		case "userDefinition":
-			return `filter:AtLsr_${fx_name}:feedbackLevel=${feedbackValue}%\r\n`;
-		case "arpus1":
-			multiplier = 0.8;
+				// 範囲指定はそのまま
+				return "";
 			break;
-		case "arpus2":
-			multiplier = 1.125;
-			break;
+
 		default:
-			console.warn("不明なlinerValue (makeFeedbackLevel)");
+			console.warn("不明なvaluePriority (makeFeedbackLevel)");
 			return "";
 	}
-
-	let feedback_home = Math.round(100 * (1 - (1 - (feedbackNormalized ** multiplier)) ** (1 / multiplier)));
-	let feedback_far = Math.round(100 * (1 - ((1 - feedbackNormalized) ** multiplier)) ** (1 / multiplier));
-	return `filter:AtLsr_${fx_name}:feedbackLevel=${feedback_home}%-${feedback_far}%\r\n`;
 }
+
+function makeReduction(fx_name, currentDef, editorValue, valuePriority, multiplier) {
+	let reductionDef = getDefValue("reduction", currentDef);
+	reductionDef = reductionDef.slice(reductionDef.indexOf(">") + 1);
+	if (reductionDef.includes("-")) {
+		// 範囲指定はそのまま
+		return "";
+	}
+	
+	let reductionValue = 0;
+	switch (valuePriority) {
+		case "editor":
+			reductionValue = parseFloat(editorValue[1]);
+			return `filter:AtLsr_${fx_name}:reduction=${reductionValue}samples\r\n`;
+			break;
+
+		case "uneditable":
+			if (reductionDef.includes("-")) {
+				// 範囲指定はそのまま
+				return "";
+			} else {
+				// editor定義値を記入
+				reductionValue = parseFloat(editorValue[1]);
+				return `filter:AtLsr_${fx_name}:reduction=${reductionValue}samples\r\n`;
+			}
+			break;
+
+		case "userDefinition":
+				// 範囲指定はそのまま
+				return "";
+			break;
+
+		default:
+			console.warn("不明なvaluePriority (makeFeedbackLevel)");
+			return "";
+	}
+}
+
+function makeSpeed(fx_name, currentDef, editorValue, valuePriority, multiplier) {
+	let speedDef = getDefValue("speed", currentDef);
+	speedDef = speedDef.slice(speedDef.indexOf(">") + 1);
+	if (speedDef.includes("-")) {
+		// 範囲指定はそのまま
+		return "";
+	}
+	
+	let speedValue = 0;
+	switch (valuePriority) {
+		case "editor":
+			speedValue = parseFloat(editorValue[1]);
+			return `filter:AtLsr_${fx_name}:speed=${speedValue}%\r\n`;
+			break;
+
+		case "uneditable":
+			if (speedDef.includes("-")) {
+				// 範囲指定はそのまま
+				return "";
+			} else {
+				// editor定義値を記入
+				speedValue = parseFloat(editorValue[1]);
+				return `filter:AtLsr_${fx_name}:speed=${speedValue}%\r\n`;
+			}
+			break;
+
+		case "userDefinition":
+				// 範囲指定はそのまま
+				return "";
+			break;
+
+		default:
+			console.warn("不明なvaluePriority (makeSpeed)");
+			return "";
+	}
+}
+
+
+
+
+
 
 
 
 function buildRetrigger(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) { // Retrigger系エフェクトの組み立て
 	let tempOrder = "";
-	tempOrder += makeUpdateTrigger(fx_name, fx_side, headTrigger);
 	tempOrder += makeWaveLength(fx_name, currentDef, editorValue, valuePriority);
-
-	switch (linerValue) {
-		case "userDefinition":
-			tempOrder += makeRate(fx_name, "rate", currentDef, 0);
-			break;
-		case "arpus1":
-			tempOrder += makeRate(fx_name, "rate", currentDef, 0.8);
-			break;
-		case "arpus2":
-			tempOrder += makeRate(fx_name, "rate", currentDef, 1.25);
-			break;
-		default:
-			console.log("不明なlinerValue");
-			break;
-	}
-
+	tempOrder += makeUpdateTrigger(fx_name, fx_side, headTrigger);
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
 	return tempOrder;
 }
@@ -690,330 +791,76 @@ function buildRetrigger(fx_side, fx_name, currentDef, editorValue, audio_effect,
 function buildGate(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) { // Gate系エフェクトの組み立て
 	let tempOrder = "";
 	tempOrder += makeWaveLength(fx_name, currentDef, editorValue, valuePriority);
-
-	switch (linerValue) {
-		case "userDefinition":
-			tempOrder += makeRate(fx_name, "rate", currentDef, 0);
-			break;
-		case "arpus1":
-			tempOrder += makeRate(fx_name, "rate", currentDef, 0.8);
-			break;
-		case "arpus2":
-			tempOrder += makeRate(fx_name, "rate", currentDef, 1.25);
-			break;
-		default:
-			console.log("不明なlinerValue");
-			break;
-	}
-
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
 	return tempOrder;
 }
 
 function buildFlanger(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) { // Flanger系エフェクトの組み立て
 	let tempOrder = "";
-
-	switch (linerValue) {
-		case "userDefinition":
-			tempOrder += makeSamples(fx_name, "delay", currentDef, 0);
-			tempOrder += makeSamples(fx_name, "depth", currentDef, 0);
-			break;
-		case "arpus1":
-			tempOrder += makeSamples(fx_name, "delay", currentDef, 3.1628);
-			tempOrder += makeSamples(fx_name, "depth", currentDef, 0);
-			break;
-		case "arpus2":
-			tempOrder += makeSamples(fx_name, "delay", currentDef, 0);
-			tempOrder += makeSamples(fx_name, "depth", currentDef, 3.1628);
-			break;
-		default:
-			console.log("不明なlinerValue");
-			break;
-	}
-
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
 	return tempOrder;
 }
 
 function buildPitchShift(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
 	let tempOrder = "";
-
-	let pitchDef = getDefValue("pitch", currentDef);
-	pitchDef = pitchDef.slice(pitchDef.indexOf(">") + 1); // >があればそれ以降を使用
-
-	// まず使うべき値を決める
-	switch (valuePriority) {
-		case "editor":
-			pitchDef = editorValue[0]; // samples単位ではないのでそのまま
-			break;
-		case "uneditable": {
-			const matches = pitchDef.match(/-?\d+(\.\d+)?/g);
-			if (matches && matches.length === 2) {
-				// 範囲指定があるならそのままreturn
-				return `filter:AtLsr_${fx_name}:pitch=${pitchDef}\r\n` + makeMix(fx_name, currentDef, mixScale) + "\r\n";
-			} else if (pitchDef.includes(".")) {
-				// 小数点がある場合はcurrentDef優先なのでpitchDef変更なし
-			} else {
-				// それ以外ならeditorValueを使用
-				pitchDef = editorValue[0];
-			}
-			break;
-		}
-		case "userDefinition":
-			// 何も変更しない
-			break;
-		default:
-			console.log("不明なvaluePriority");
-			return "";
-	}
-
-	let pitchValue = parseFloat(pitchDef);
-	if (isNaN(pitchValue)) {
-		console.warn("pitchDefが数値として解釈できません:", pitchDef);
-		return "";
-	}
-
-	// 次に linerValue に応じた加工
-	switch (linerValue) {
-		case "userDefinition":
-			tempOrder += `filter:AtLsr_${fx_name}:pitch=${pitchValue}\r\n`;
-			break;
-		case "arpus1":
-			tempOrder += `filter:AtLsr_${fx_name}:pitch=0-${Math.round(pitchValue)}\r\n`;
-			break;
-		case "arpus2":
-			tempOrder += `filter:AtLsr_${fx_name}:pitch=0.000-${pitchValue.toFixed(3)}\r\n`;
-			break;
-		default:
-			console.log("不明なlinerValue");
-			break;
-	}
-
+	tempOrder += makePitch(fx_name, currentDef, editorValue, valuePriority, 0);
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
 	return tempOrder;
 }
 
 function buildBitCrusher(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
-	let reductionDef = getDefValue("reduction", currentDef);
-	reductionDef = reductionDef.slice(reductionDef.indexOf(">") + 1); // >があればそれ以降を使用
-
-	// valuePriorityによるreductionDefの決定
-	switch (valuePriority) {
-		case "editor":
-			reductionDef = `${editorValue[0]}samples`;
-			break;
-		case "uneditable":
-			if (!reductionDef.includes("-")) {
-				reductionDef = `${editorValue[0]}samples`;
-			} else {
-				// currentDefに範囲指定があったならすぐその場でreturn
-				return `filter:AtLsr_${fx_name}:reduction=${reductionDef}\r\n` + makeMix(fx_name, currentDef, mixScale) + "\r\n";
-			}
-			break;
-		case "userDefinition":
-			// 何もせずcurrentDefそのまま使用
-			break;
-		default:
-			console.log("不明なvaluePriority");
-			return "";
-	}
-
-	// linerValueによる範囲加工
-	switch (linerValue) {
-		case "userDefinition":
-			// そのまま
-			break;
-		case "arpus1":
-			reductionDef = `0samples-${reductionDef}`;
-			break;
-		case "arpus2":
-			reductionDef = `${reductionDef}-0samples`;
-			break;
-		default:
-			console.log("不明なlinerValue");
-			return "";
-	}
-
-	// 最後にまとめて返す
-	return `filter:AtLsr_${fx_name}:reduction=${reductionDef}\r\n` + makeMix(fx_name, currentDef, mixScale) + "\r\n";
+	let tempOrder = "";
+	tempOrder += makeReduction(fx_name, currentDef, editorValue, valuePriority, 0);
+	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
+	return tempOrder;
 }
 
 function buildPhaser(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
 	let tempOrder = "";
-
-	switch (linerValue) {
-		case "userDefinition":
-			tempOrder += makeLength(fx_name, "period", currentDef, 0);
-			tempOrder += makeFreq(fx_name, "loFreq", currentDef, 0);
-			tempOrder += makeFreq(fx_name, "hiFreq", currentDef, 0);
-			tempOrder += makeFloat(fx_name, "Q", currentDef, 0, [0.1, 50]);
-			break;
-		case "arpus1":
-			tempOrder += makeLength(fx_name, "period", currentDef, 0); // 後で倍率を設定
-			tempOrder += makeFreq(fx_name, "loFreq", currentDef, 0);
-			tempOrder += makeFreq(fx_name, "hiFreq", currentDef, 0);
-			tempOrder += makeFloat(fx_name, "Q", currentDef, 1.2, [0.1, 50]);
-			break;
-		case "arpus2":
-			tempOrder += makeLength(fx_name, "period", currentDef, 0); // 後で倍率を設定
-			tempOrder += makeFreq(fx_name, "loFreq", currentDef, 5);
-			tempOrder += makeFreq(fx_name, "hiFreq", currentDef, 5);
-			tempOrder += makeFloat(fx_name, "Q", currentDef, 0, [0.1, 50]);
-			break;
-		default:
-			console.log("不明なlinerValue");
-			return "";
-	}
-
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
-
 	return tempOrder;
 }
 
 function buildWobble(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
 	let tempOrder = "";
-
 	tempOrder += makeWaveLength(fx_name, currentDef, editorValue, valuePriority);
-
-	switch (linerValue) {
-		case "userDefinition":
-			tempOrder += makeFreq(fx_name, "loFreq", currentDef, 0);
-			tempOrder += makeFreq(fx_name, "hiFreq", currentDef, 0);
-			tempOrder += makeFloat(fx_name, "Q", currentDef, 0, [0.1, 50]);
-			break;
-		case "arpus1":
-			tempOrder += makeFreq(fx_name, "loFreq", currentDef, 0);
-			tempOrder += makeFreq(fx_name, "hiFreq", currentDef, 0);
-			tempOrder += makeFloat(fx_name, "Q", currentDef, 1.2, [0.1, 50]);
-			break;
-		case "arpus2":
-			tempOrder += makeFreq(fx_name, "loFreq", currentDef, 5);
-			tempOrder += makeFreq(fx_name, "hiFreq", currentDef, 5);
-			tempOrder += makeFloat(fx_name, "Q", currentDef, 0, [0.1, 50]);
-			break;
-		default:
-			console.log("不明なlinerValue");
-			return "";
-	}
-
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
-
 	return tempOrder;
 }
 
 function buildTapeStop(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
 	let tempOrder = "";
-
 	// trigger固定
 	tempOrder += `filter:AtLsr_${fx_name}:trigger=on\r\n`;
-
-	let speedDef = getDefValue("speed", currentDef);
-	switch (valuePriority) {
-		case "editor":
-			speedDef = `${editorValue[0]}%`;
-			break;
-
-		case "uneditable": {
-			if (speedDef.includes("-")) {
-				// 範囲指定は上書きしない
-			} else {
-				speedDef = `${editorValue[0]}%`;
-			}
-			break;
-		}
-
-		case "userDefinition":
-				// ユーザー定義値をそのまま使う
-			break;
-
-		default:
-			console.warn("不明なvaluePriority (TapeStop)");
-			return "";
-	}
-	
-	if (speedDef.includes("-")) {
-		// speedは範囲指定なのでその場で精製
-		tempOrder += `filter:AtLsr_${fx_name}:speed=${speedDef}\r\n`;
-	} else {
-	let speedValue = parseInt(speedDef);
-		
-		switch (linerValue) {
-			case "userDefinition":
-				// そのまま
-				tempOrder += `filter:AtLsr_${fx_name}:speed=${speedValue}%\r\n`;
-				break;
-			case "arpus1":
-				speedValue = Math.round(speedValue * 0.15);
-				tempOrder += `filter:AtLsr_${fx_name}:speed=0%-${speedValue}%\r\n`;
-				break;
-			case "arpus2":
-				speedValue = Math.round(speedValue * 0.35);
-				tempOrder += `filter:AtLsr_${fx_name}:speed=0%-${speedValue}%\r\n`;
-				return tempOrder;
-			default:
-				console.warn("不明なlinerValue (TapeStop)");
-				return "";
-		}
-	}
-	// mix
+	tempOrder += makeSpeed(fx_name, currentDef, editorValue, valuePriority, 0);
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
 	return tempOrder;
 }
 
 function buildEcho(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
 	let tempOrder = "";
-
 	// まず updateTrigger
 	tempOrder += makeUpdateTrigger(fx_name, fx_side, headTrigger);
-
 	// waveLength
 	tempOrder += makeWaveLength(fx_name, currentDef, editorValue, valuePriority);
-
 	// feedbackLevel（linerValueを反映して取得）
 	tempOrder += makeFeedbackLevel(fx_name, currentDef, editorValue, valuePriority, linerValue);
-
 	// mix
 	tempOrder += makeMix(fx_name, currentDef, mixScale) + "\r\n";
-
 	return tempOrder;
 }
 
 function buildSideChain(fx_side, fx_name, currentDef, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
 	let tempOrder = "";
-
-	// linerValueに応じた倍率設定
-	let linerMultiplier = 0;
-	switch (linerValue) {
-		case "userDefinition":
-			tempOrder += makeLength(fx_name, "holdTime", currentDef, 0);
-			tempOrder += makeLength(fx_name, "attackTime", currentDef, 0);
-			tempOrder += makeLength(fx_name, "releaseTime", currentDef, 0);
-				break;
-		case "arpus1":
-			tempOrder += makeLength(fx_name, "holdTime", currentDef, 0);
-			tempOrder += makeLength(fx_name, "attackTime", currentDef, 1.5);
-			tempOrder += makeLength(fx_name, "releaseTime", currentDef, 1.5);
-			break;
-		case "arpus2":
-			tempOrder += makeLength(fx_name, "holdTime", currentDef, 2);
-			tempOrder += makeLength(fx_name, "attackTime", currentDef, 0);
-			tempOrder += makeLength(fx_name, "releaseTime", currentDef, 0);
-			break;
-		default:
-			console.warn("不明なlinerValue (SideChain)");
-			return "";
-	}
-	
 	// ratio
 	tempOrder += makeRatio(fx_name, currentDef, mixScale) + "\r\n";
-
 	return tempOrder;
 }
 
 
 
 
-function getTempOrder(fx_side, fx_name, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue) {
+function getTempOrder(fx_side, fx_name, editorValue, audio_effect, headTrigger, valuePriority, mixScaleMap, linerValueMap) {
     let currentDef = audio_effect.fx.def.find(entry => entry[0] === fx_name);
     if (!currentDef) {
         console.log(`${fx_name} は定義されていません`);
@@ -1021,6 +868,8 @@ function getTempOrder(fx_side, fx_name, editorValue, audio_effect, headTrigger, 
     }
 
     const fxType = getTypeValue(currentDef);
+	const linerValue = linerValueMap[fxType] || "userDefinition";
+	const mixScale = mixScaleMap[fxType] || "userDefinition";
     let tempOrder = "";
 
     switch (fxType) {
@@ -1137,6 +986,24 @@ function getMissingDefinitions(defineLines, currentEffectList) {
 
 
 
+function collectLinerValues() {
+  const values = {};
+  document.querySelectorAll(".linerValueDropdown").forEach(select => {
+    const type = select.closest(".liner-selector").dataset.type;
+    values[type] = select.value;
+  });
+  return values;
+}
+
+function collectMixScales() {
+  const mixScales = {};
+  document.querySelectorAll(".mixScaleDropdown").forEach(select => {
+    const type = select.closest(".mixscale-selector").dataset.type;
+    mixScales[type] = select.value;
+  });
+  return mixScales;
+}
+
 
 
 document.getElementById('run-button').addEventListener('click', () => {
@@ -1146,8 +1013,8 @@ document.getElementById('run-button').addEventListener('click', () => {
 
 	const headTrigger = document.getElementById('headTrigger').value;
 	const valuePriority = document.getElementById('valuePriority').value;
-	const mixScale = document.getElementById('mixScale').value;
-	const linerValue = document.getElementById('linerValue').value;
+	const mixScaleMap = collectMixScales();
+	const linerValueMap = collectLinerValues();
 
 	// 初期値を設定
 	let measureCount = 0;
@@ -1233,16 +1100,16 @@ document.getElementById('run-button').addEventListener('click', () => {
 					// 変換したエフェクトを覚えておく
 					!currentEffectList.includes(fx_name) ? currentEffectList.push(fx_name) : null;
 					// 臨時命令の始点を作成
-					processingText_effect = getTempOrder(fx_side, fx_name, editorValue, audio_effect, headTrigger, valuePriority, mixScale, linerValue);
+					processingText_effect = getTempOrder(fx_side, fx_name, editorValue, audio_effect, headTrigger, valuePriority, mixScaleMap, linerValueMap);
 					processingText_effect += `fx_${fx_side}=\r\n`; //空のFxエフェクトに変更する
 				}
 			} else if (notesLine.test(lines[i])) { 
 				// ノーツが来たので必要に応じてmix0を生成
-				if (lines[i].charAt[5] !== "1" && fxL !== "") {
+				if (lines[i].charAt(5) !== "1" && fxL !== "") {
 					processingText_mix0 += getMix0(fxL, audio_effect);
 					fxL = "";
 				}
-				if (lines[i].charAt[6] !== "1" && fxR !== "") {
+				if (lines[i].charAt(6) !== "1" && fxR !== "") {
 					processingText_mix0 += getMix0(fxR, audio_effect);
 					fxR = "";
 				}
