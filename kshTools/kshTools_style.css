@@ -1,0 +1,27 @@
+body ul {
+    font-size: 1.5em; /* 文字サイズを1.5倍にする */
+}
+
+footer ul {
+    list-style-type: none; /* リストマーカーを削除 */
+    padding: 0;
+}
+
+footer li {
+    margin: 0;
+}
+
+footer a {
+    font-size: 15px;            /* フォントサイズを設定 */
+    padding: 5px 10px;          /* パディングを設定 */
+    display: inline-block;      /* インラインブロックでサイズを反映 */
+    text-decoration: none;      /* 下線を削除 */
+    color: #000;                /* テキストカラー */
+    border: 2px solid #000;     /* ボーダーを追加 */
+    border-radius: 5px;         /* 角を丸くする */
+    background-color: #f0f0f0;  /* 背景色 */
+}
+
+footer a:hover {
+    background-color: #ddd;     /* ホバー時の背景色 */
+}
