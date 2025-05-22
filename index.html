@@ -1,35 +1,56 @@
 <!DOCTYPE html>
 <html>
-<style>
-	body ul {
-		font-size: 1.5em; /* 文字サイズを1.5倍にする */
-	}
-</style>
+<head>
+    <meta charset="UTF-8">
+    <title>Arpusのおもちゃ箱</title>
+    <link rel="stylesheet" href="index_style.css">
+</head>
 <body>
-	<h1>Arpusのおもちゃ箱</h1>
-	<h2>K-Shoot MANIA Packages</h2>
-	<ul>
-		<li><a href="./Package001/Package001.html">Package001(2025/4/1に出す)</a></li>
-		<li><a href="./Package002/Package002.html">Package002(いつか作るかも)</a></li>
-		<li><a href="./Package003/Package003.html">Package003(いつか作るかも)</a></li>
-	</ul>
-	<h2>K-Shoot MANIA Tools</h2>
-	<p>意図しない変換により譜面ファイルが破損しても責任は負いかねます</p>
-	<p>変換前のファイルは削除せずに大切に保管してください</p>
-	<p>Windowsセキュリティによりファイルが開けない場合、テキストエディタでひらいて保存すると解決する場合があります</p>
-	<ul>
-		<li><a href="./kshTools/kshSmaller/kshSmaller.html">.kshファイルの軽量化</a></a></li>
-		<li><a href="./kshTools/Constant/Constant.html">手動コンスタント</a></li>
-		<li><a href="./kshTools/CenterSplit/CenterSplit.html">zoom_sideからcenter_splitを生成</a></li>
-		<li><a href="./kshTools/Scale/Scale.html">演出のスケール変換</a></li>
-		<li><a href="./kshTools/Effectms/Effectms.html">ユーザー定義エフェクトメーカー</a></li>
-		<li><a href="./kshTools/msAlternate/msAlternate.html">msエフェクト変換</a></li>
-		<li><a href="./kshTools/laserEffects/laserEf.html">Fx-Laserエフェクト変換</a></li>
-	</ul>
-	<h2>Minecraft Tools</h2>
-	<ul>
-		<li><a href="./mcTools/Translate/Translate.html">(たぶん作らない)</a></li>
-	</ul>
-	<footer></footer>
+    <h1>Arpusのおもちゃ箱</h1>
+
+    <h2>K-Shoot MANIA Packages</h2>
+    <ul>
+        <li><a href="https://drive.google.com/drive/folders/1jUC1MET1L1Rfae15q8s1EMYnsXoVO6xW?usp=drive_link">WAYANIOriginal</a></li>
+        <li><a href="./Package002/Package002.html">Package002(いつか作るかも)</a></li>
+        <li><a href="./Package003/Package003.html">Package003(いつか作るかも)</a></li>
+    </ul>
+
+    <h2>K-Shoot MANIA Tools</h2>
+    <div id="tool-list">ツール一覧を読み込み中…</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ★ フェッチ先をサブフォルダ内に変更
+            fetch('kshTools/kshTools.html')
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const tools = doc.querySelector('#tool-list');
+                    if (tools) {
+                        const container = document.getElementById('tool-list');
+                        container.innerHTML = tools.innerHTML;
+                        // リンクを index.html から参照できるように補正
+                        container.querySelectorAll('a').forEach(a => {
+                            const href = a.getAttribute('href');
+                            // "./foo/bar" → "kshTools/foo/bar"
+                            a.setAttribute('href', href.replace(/^\.\//, 'kshTools/'));
+                        });
+                    } else {
+                        console.error('ツール一覧要素が見つかりません');
+                    }
+                })
+                .catch(err => {
+                    console.error('ツール一覧の読み込みに失敗しました', err);
+                    document.getElementById('tool-list').textContent = 'ツール一覧の読み込みに失敗しました';
+                });
+        });
+    </script>
+
+    <h2>Minecraft Tools</h2>
+    <ul>
+        <li><a href="./mcTools/Translate/Translate.html">(たぶん作らない)</a></li>
+    </ul>
+
+    <footer></footer>
 </body>
 </html>
