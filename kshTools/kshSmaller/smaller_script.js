@@ -103,7 +103,7 @@ function conciseSegment(processText, needUnits) {
 	let conciseText = "";
 	for (let l = 0; l < processLines.length; l++) {
 		if (notes.test(processLines[l])) {
-			if (processUnit % need === 0) {
+			if (processUnit % need !== need - 1 || need === 1) {
 				conciseText += processLines[l] + "\r\n";
 			}
 			processUnit += 1;
@@ -114,23 +114,7 @@ function conciseSegment(processText, needUnits) {
 	return conciseText;
 }
 
-
-
-
-document.getElementById("run-button").addEventListener("click", () => {
-
-    const fileName = document.querySelector("#fileName")?.textContent;
-    if (!fileName) {
-        alert("ファイルが選択されていません");
-        return;
-    }
-
-    if (!fileName.endsWith(".ksh")) {
-        alert("対応していないファイル形式です。拡張子は .ksh である必要があります。");
-        return;
-    }
-
-	const text = document.getElementById('textArea').value;
+function reduce1line(text) {
 	let lines = text.split(/\r?\n/);
 	let processText = "";
 	let newText = "";
@@ -156,6 +140,36 @@ document.getElementById("run-button").addEventListener("click", () => {
 		}
 	}
 	newText += processText;
+	return newText;
+}
+
+
+
+
+document.getElementById("run-button").addEventListener("click", () => {
+
+    const fileName = document.querySelector("#fileName")?.textContent;
+    if (!fileName) {
+        alert("ファイルが選択されていません");
+        return;
+    }
+
+    if (!fileName.endsWith(".ksh")) {
+        alert("対応していないファイル形式です。拡張子は .ksh である必要があります。");
+        return;
+    }
+
+	let text = document.getElementById('textArea').value;
+	let newText = "";
+	
+	let lines = text.split(/\r?\n/);
+	
+	for (let i = 0; i < 12; i++) {
+		newText = reduce1line(text);
+		if (text === newText) {
+			break;
+		}
+	}
 
 	// ダウンロード用のファイル作成
 	const bom = "\uFEFF";
