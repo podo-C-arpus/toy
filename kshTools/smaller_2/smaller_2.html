@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ksh軽量化ツール</title>
+</head>
+<body>
+    <h2>kshファイルの冗長性削除ツール</h2>
+    <input type="file" id="kshInput" accept=".ksh"><br><br>
+    <button id="processBtn">軽量化を実行</button>
+    <a id="downloadLink" style="display:none;">ダウンロード</a>
+
+    <script type="module">
+        import { parseKSH, removeRedundant, stringifyKSH } from '../module/kshParserModule.js';
+
+        document.getElementById('processBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('kshInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("ファイルを選択してください。");
+                return;
+            }
+
+            const text = await file.text();
+            const parsed = parseKSH(text);
+            removeRedundant(parsed);
+            const result = stringifyKSH(parsed);
+            const resultWithBOM = "\uFEFF" + result;
+            const blob = new Blob([resultWithBOM], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.getElementById('downloadLink');
+            link.href = url;
+            link.download = file.name.replace(/\.ksh$/, '') + '_small.ksh';
+            link.style.display = 'inline';
+            link.textContent = 'ダウンロードはこちら';
+        });
+    </script>
+</body>
+</html>

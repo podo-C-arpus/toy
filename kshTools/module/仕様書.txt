@@ -1,0 +1,106 @@
+# K-Shoot Mania 軽量オブジェクト形式仕様書 (v2025-06)
+
+この仕様書は、K-Shoot Mania の .ksh 譜面ファイルをブラウザ上で扱いやすい JSON 形式に変換・加工・再出力するための軽量化フォーマットを定義する。
+
+---
+
+## ✅ トップレベル構造
+
+```json
+{
+  "meta": { ... },
+  "measures": [ ... ],
+  "userEffect": [ ... ]
+}
+```
+
+### 1. meta（メタ情報）
+- `ksh` ファイルの先頭（最初の `--` より前）にある `key=value` 行群。
+- すべて文字列として保存。
+- 例：
+```json
+{
+  "title": "Chronos",
+  "artist": "ginkiha",
+  "t": "150"
+}
+```
+
+### 2. measures（小節データ）
+- 譜面データ本体。
+- 各小節は配列要素として順に格納。
+- 小節番号は **1始まり（barNumber）** だが、配列インデックスは 0 始まり。
+- 1小節ごとに以下の形式を持つ：
+
+```json
+{
+  "beat": "4/4",
+  "currentBPM": "150.000",
+  "main": [
+    {
+      "comments": ["// some comment"],      // 省略可能
+      "command": [                           // 省略可能
+        { "type": "t", "value": ["120.000"] },
+        { "type": "beat", "value": ["3/8"] }
+      ],
+      "notes": {
+        "bt": { "a": "chip", "b": null, "c": null, "d": "long" },
+        "fx": { "l": null, "r": "se_chip" },
+        "laser": { "l": "0", "r": "-" }
+      },
+      "rotation": "x+"                      // 省略可能
+    }
+  ]
+}
+```
+
+- `main` はその小節内のノーツ単位（ユニット）配列。
+- `beat`: その小節に明示された拍子。変更がない場合でも持つ。
+- `currentBPM`: その小節の開始時点で有効な BPM（直前までに出現した `t=`）
+
+---
+
+### 3. userEffect（末尾の未分類データ）
+- 最後の `--` より後ろの行群。
+- エフェクト定義や非標準設定など。文字列の配列として保存。
+
+---
+
+## ✅ notes の仕様
+
+```json
+"notes": {
+  "bt": { "a": "chip", "b": null, "c": null, "d": "long" },
+  "fx": { "l": "chip", "r": "se_chip" },
+  "laser": { "l": "-", "r": ":" }
+}
+```
+
+- `"chip"`: チップノーツ
+- `"long"`: ロングノーツ
+- `"se_chip"`: 効果音付きチップノーツ（FXのみ）
+- 存在しないノーツは **キーごと削除**または `null`
+
+---
+
+## ✅ 補足仕様
+
+- `rotation` は存在しない場合、キーごと削除可能
+- `comments`, `command`, `rotation` はすべてオプション
+- `command` は `{ type, value[] }` 形式で複数記録可
+- `value` は必ず配列（1つでも）
+
+---
+
+## ✅ 推奨関数設計
+
+- `parseKSH(text: string) → object`
+- `stringifyKSH(obj: object) → string`
+- `getPeriod(obj, barNumber) → measureObject`
+- `updatePeriod(obj, barNumber, measureObject)`
+- `insertPeriod(obj, barNumber, measureObject)`
+- `removePeriod(obj, barNumber)`
+
+---
+
+以上が仕様書全文です。
