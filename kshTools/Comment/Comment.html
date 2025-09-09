@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>注釈を命令に変換</title>
+	<link rel="stylesheet" href="style.css"
+</head>
+
+<body>
+	<h1>Arpusのおもちゃ箱</h1>
+	<h2>k-shoot mania Tools</h2>
+	<h1>注釈を命令に変換</h1>
+	<p>注釈による譜面ファイルの直接編集を支援します</p>
+	<h3>記入例</h3>
+	<p>edotorで作業する拍子とBPMが完成後のものと異なるとき</p>
+	<p>//#beat=#t=#beat=2/4CRLFt=240</p>
+	<p>複数行の臨時命令を一か所に記入したいとき</p>
+	<p>fx:Re*:updateTrigger=onCRLFfx:Re*:mix=100%</p>
+	<h3>命令に対する操作</h3>
+	<div id="operations">
+		<p>	
+			<label>
+				<input id="delete_slash" type="checkbox" checked>
+				"#"で始まる注釈を命令に変換
+			</label><br>
+			<label>
+				<input id="alter_crlf" type="checkbox" checked>
+				"CRLF"を改行に変換
+			</label><br>
+			<label>
+				<input id="delete_beat" type="checkbox" checked>
+				"beat=#"位置にある既存のbeatを削除
+			</label><br>
+			<label>
+				<input id="delete_t" type="checkbox" checked>
+				"t=#"位置にある既存のtを削除
+			</label><br>
+		</p>
+	</div>
+	<div id="inputFile">
+		<p id="dropArea">ここにファイルをドロップしてください</p>
+	</div>
+	<p id="fileName">file name</p>
+	<textarea id="textArea" >プレビュー</textarea>
+	
+	<script>
+	// ドロップエリア、テキストエリア、ファイル名表示エリアの要素を取得
+	const dropArea = document.getElementById('dropArea');
+	const textArea = document.getElementById('textArea');
+	const fileNameElement = document.getElementById('fileName');
+	
+	// ドロップエリアにドラッグオーバーしたときのイベントリスナー
+	dropArea.addEventListener('dragover', (event) => {
+		event.preventDefault();
+		dropArea.classList.add('dragover'); // ドラッグオーバー時のスタイルを適用
+	});
+	
+	// ドロップエリアからドラッグアウトしたときのイベントリスナー
+	dropArea.addEventListener('dragleave', () => {
+		dropArea.classList.remove('dragover'); // ドラッグオーバー時のスタイルを解除
+	});
+	
+	// ファイルをドロップしたときのイベントリスナー
+	dropArea.addEventListener('drop', (event) => {
+		event.preventDefault();
+		dropArea.classList.remove('dragover');
+	
+		const file = event.dataTransfer.files[0]; // ドロップされた最初のファイルを取得
+		const reader = new FileReader(); // FileReaderオブジェクトを作成
+	
+		// ファイルを読み込んだ後の処理
+		reader.onload = () => {
+			textArea.value = reader.result; // テキストエリアに読み込んだ内容を表示
+			fileNameElement.textContent = file.name; // ファイル名を表示
+		};
+	
+		// ファイルをテキストとして読み込む
+		reader.readAsText(file);
+	});
+	</script>
+
+	<p>
+		<button id="run-button">実行</button>
+	</p>
+	<script src="comment_script.js"></script>
+
+	<footer>
+		<ul>
+			<li><a href="../kshTools.html">back</a></li>
+		</ul>
+	</footer>
+	<p>最終更新 2025/09/09</p>
+</body>
+
+
+</html>
