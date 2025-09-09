@@ -1,35 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>Arpusのおもちゃ箱 – K-Shoot MANIA Tools</title>
-    <link rel="stylesheet" href="kshTools_style.css">
+  <meta charset="UTF-8">
+  <title>K-Shoot Mania 開発支援ツール</title>
+  <link rel="stylesheet" href="kshTools.css">
 </head>
 <body>
+
+  <header>
     <h1>Arpusのおもちゃ箱</h1>
+    <h1>K-Shoot Mania 開発支援ツール</h1>
+  </header>
 
-    <h2>K-Shoot MANIA Tools</h2>
-    <p>意図しない変換により譜面ファイルが破損しても責任は負いかねます</p>
-    <p>変換前のファイルは削除せずに大切に保管してください</p>
-    <p>Windowsセキュリティによりファイルが開けない場合、テキストエディタでひらいて保存すると解決する場合があります</p>
+  <section class="intro">
+    <p>K-Shoot Mania 譜面ファイル（.ksh）を加工・分析・変換するためのツール群です。用途に応じて、各ツールのページにアクセスしてください。</p>
+  </section>
 
-    <ul id="tool-list">
-        <li><a href="./replace/replace.html">.kshファイルの一括置換</a></li>
-        <li><a href="./kshSmaller/kshSmaller.html">.kshファイルの軽量化</a></li>
-        <li><a href="./Constant/Constant.html">手動コンスタント</a></li>
-        <li><a href="./CenterSplit/CenterSplit.html">zoom_sideからcenter_splitを生成</a></li>
-        <li><a href="./Scale/Scale.html">演出のスケール変換</a></li>
-        <li><a href="./Effectms/Effectms.html">ユーザー定義エフェクトメーカー</a></li>
-        <li><a href="./msAlternate/msAlternate.html">msエフェクト変換</a></li>
+  <main class="tool-list">
+    <h2>ツール一覧</h2>
+    <ul>
+      <li>
+        <a href="./replace/replace.html" class="tool-link">.kshファイルの一括置換</a><br>
+        <span class="tool-description">複数の.kshファイル内の文字列を一括で置換します。</span>
+      </li>
+      <li>
+        <a href="./Comment/Comment.html" class="tool-link">注釈を命令に変換</a><br>
+        <span class="tool-description">注釈による譜面ファイルの編集を支援します</span>
+      </li>
+      <li>
+        <a href="./kshSmaller/kshSmaller.html" class="tool-link">.kshファイルの軽量化</a><br>
+        <span class="tool-description">冗長なユニットや命令、未使用エフェクトなどを削除してファイルを整理します。</span>
+      </li>
+      <li>
+        <a href="./Constant/Constant.html" class="tool-link">手動コンスタント</a><br>
+        <span class="tool-description">指定したタイミングでコンスタント指定を手動で挿入できます。</span>
+      </li>
+      <li>
+        <a href="./CenterSplit/CenterSplit.html" class="tool-link">zoom_sideからcenter_splitを生成</a><br>
+        <span class="tool-description">カメラ演出のzoom_sideからcenter_splitへの変換を行います。</span>
+      </li>
+      <li>
+        <a href="./Scale/Scale.html" class="tool-link">演出のスケール変換</a><br>
+        <span class="tool-description">カメラエフェクトやレーザー演出のスケーリング変換を行います。</span>
+      </li>
+      <li>
+        <a href="./Effectms/Effectms.html" class="tool-link">ユーザー定義エフェクトメーカー</a><br>
+        <span class="tool-description">ms単位でエフェクト定義を作成・編集するためのツールです。</span>
+      </li>
+      <li>
+        <a href="./msAlternate/msAlternate.html" class="tool-link">msエフェクト変換</a><br>
+        <span class="tool-description">ms指定によるエフェクトの置換や補間処理を行います。</span>
+      </li>
+      <li>
+        <a href="./test/test.html" class="tool-link">test - 小節番号コメント挿入</a><br>
+        <span class="tool-description">各小節の先頭に // 小節番号 を挿入する検証用ツールです。</span>
+      </li>
     </ul>
+  </main>
 
-    <p>不具合の報告・要望などは X: @pca_result までご連絡ください</p>
+  <section class="notes">
+    <h2>ご利用にあたって</h2>
+    <p>このツールは K-Shoot Mania の譜面制作支援を目的とした非公式ツールです。万一のデータ損失に備えて、元ファイルを削除せずバックアップを必ず残してください。</p>
+    <p>Windows セキュリティによりファイルが開けない場合、テキストエディタで開いて上書き保存すると解決することがあります。</p>
+    <p>不具合・ご意見等は X: <a href="https://x.com/pca_result" target="_blank">@pca_result</a> までお知らせください。</p>
+  </section>
 
-    <footer>
-        <ul>
-            <!-- index.html へ戻るリンク -->
-            <li><a href="../index.html">back</a></li>
-        </ul>
-    </footer>
+  <footer>
+    <p>最終更新日：2025-07-07</p>
+    <nav>
+      <a href="../index.html" class="back-to-index">ポータルに戻る</a>
+    </nav>
+  </footer>
+
 </body>
 </html>

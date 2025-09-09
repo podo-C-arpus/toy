@@ -1,0 +1,87 @@
+/* kshTools.css */
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f8f8f8;
+  color: #333;
+  margin: 2em auto;
+  padding: 2em;
+  max-width: 800px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2em;
+}
+
+header h1 {
+  font-size: 1.8em;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.3em;
+}
+
+section.intro,
+section.notes {
+  margin-bottom: 2em;
+  font-size: 1em;
+  line-height: 1.6;
+}
+
+main.tool-list h2 {
+  font-size: 1.3em;
+  margin-bottom: 1em;
+  border-left: 4px solid #0078d4;
+  padding-left: 0.5em;
+}
+
+.tool-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.tool-list li {
+  margin-bottom: 1.5em;
+}
+
+.tool-link {
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: none;
+  color: #0078d4;
+}
+
+.tool-link:hover {
+  text-decoration: underline;
+}
+
+.tool-description {
+  display: block;
+  margin-top: 0.2em;
+  color: #666;
+}
+
+footer {
+  margin-top: 2em;
+  font-size: 0.9em;
+  text-align: right;
+  color: #666;
+}
+
+.back-to-index {
+  display: inline-block;
+  margin-top: 0.5em;
+  padding: 0.3em 0.8em;
+  background-color: #eee;
+  color: #333;
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.back-to-index:hover {
+  background-color: #ddd;
+}
