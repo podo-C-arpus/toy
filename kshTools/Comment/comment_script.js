@@ -24,7 +24,7 @@ document.getElementById("run-button").addEventListener("click", () => {
     }
 
     const text = document.getElementById("textArea").value;
-    const lines = text.split("\r\n");
+    const lines = text.split(/\r?\n/);
     let kshTexts = []; // 3次元配列 [bar][unit][line]
     let bar = 0;
     let unit = 0;
