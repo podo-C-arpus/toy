@@ -79,26 +79,27 @@ document.getElementById("run-button").addEventListener("click", () => {
                     for (let i = 0; i < unitData.length; i++) {
                         let textLine = unitData[i];
                         if (textLine.startsWith("beat=")) {
-                            kshTexts[barIndex][unitIndex][lineIndex] = "";
+                            kshTexts[barIndex][unitIndex][i] = "";
                             break;
                         }
                     }
                 }
             }
             if (delete_t) { // delete_t オプションの処理
-                const t_not_beat = /(^|[^a-zA-Z])t=#/g;
+                const t_not_beat_test = /(^|[^a-zA-Z])t=#/;
+                const t_not_beat_repl = /(^|[^a-zA-Z])t=#/g;
                 let flag = false;
                 unitData.forEach((textLine, lineIndex) => {
-                    if (t_not_beat.test(textLine)) {
+                    if (t_not_beat_test.test(textLine)) {
                         flag = true;
-                        kshTexts[barIndex][unitIndex][lineIndex] = textLine.replace(t_not_beat, "$1");
+                        kshTexts[barIndex][unitIndex][lineIndex] = textLine.replace(t_not_beat_repl, "$1");
                     }
                 });
                 if (flag) {
                     for (let i = 0; i < unitData.length; i++) {
                         let textLine = unitData[i];
                         if (textLine.startsWith("t=")) {
-                            kshTexts[barIndex][unitIndex][lineIndex] = "";
+                            kshTexts[barIndex][unitIndex][i] = "";
                             break;
                         }
                     }
@@ -116,17 +117,17 @@ document.getElementById("run-button").addEventListener("click", () => {
     }
 
     let newText = "";
-    let testadded = false;
     kshTexts.forEach((barData) => {
+        let textadded = false;
         barData.forEach((unitData) => {
             unitData.forEach((textLine) => {
                 if (textLine && (textLine !== "")) { // 空行を除外
-                    testadded = true;
+                    textadded = true;
                     newText += textLine + "\r\n";
                 }
             });
         });
-        if (testadded) {
+        if (textadded) {
             newText += "--\r\n"; // 小節区切りを追加
         }
     });
