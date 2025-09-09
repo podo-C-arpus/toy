@@ -1,30 +1,30 @@
 const notesLine = /^[0-2]{4}\|[0-2]{2}\|[\s\S]*$/;
 
-document.getElementById('run-button').addEventListener('click', () => {
-	const bom = '\uFEFF';
+document.getElementById("run-button").addEventListener("click", () => {
+	const bom = "\uFEFF";
 	
     // 入力値を取得
-    const delete_slash = document.getElementById('delete_slash').checked;
-    const alter_crlf = document.getElementById('alter_crlf').checked;
-    const delete_beat = document.getElementById('delete_beat').checked;
-    const delete_t = document.getElementById('delete_t').checked;
+    const delete_slash = document.getElementById("delete_slash").checked;
+    const alter_crlf = document.getElementById("alter_crlf").checked;
+    const delete_beat = document.getElementById("delete_beat").checked;
+    const delete_t = document.getElementById("delete_t").checked;
 
 
     // ファイル名とテキストエリアの内容を取得
-    const fileName = document.querySelector('#fileName').textContent;
+    const fileName = document.querySelector("#fileName").textContent;
     if (!fileName) {
-        alert('ファイルが選択されていません');
+        alert("ファイルが選択されていません");
         return;
     }
 
     // ファイル拡張子を確認
-    if (!fileName.endsWith('.ksh')) {
-        alert('対応していないファイル形式です。拡張子は .ksh である必要があります。');
+    if (!fileName.endsWith(".ksh")) {
+        alert("対応していないファイル形式です。拡張子は .ksh である必要があります。");
         return;
     }
 
-    const text = document.getElementById('textArea').value;
-    const lines = text.split('\r\n');
+    const text = document.getElementById("textArea").value;
+    const lines = text.split("\r\n");
     let kshTexts = []; // 3次元配列 [bar][unit][line]
     let bar = 0;
     let unit = 0;
@@ -36,7 +36,7 @@ document.getElementById('run-button').addEventListener('click', () => {
     ensure();
 
     for (const textLine of lines) { // 3次元配列に変換
-        if (textLine === '--') {
+        if (textLine === "--") {
             bar += 1;
             unit = 0;
             ensure();
@@ -70,7 +70,7 @@ document.getElementById('run-button').addEventListener('click', () => {
             if (delete_beat) { // delete_beat オプションの処理
                 let flag = false;
                 unitData.forEach((textLine, lineIndex) => {
-                    if (textLine.includes('beat=delete')) {
+                    if (textLine.includes("beat=delete")) {
                         flag = true;
                         kshTexts[barIndex][unitIndex][lineIndex] = textLine.replace(/beat=#/g, "");
                     }
@@ -78,8 +78,8 @@ document.getElementById('run-button').addEventListener('click', () => {
                 if (flag) {
                     for (let i = 0; i < unitData.length; i++) {
                         let textLine = unitData[i];
-                        if (textLine.startsWith('beat=')) {
-                            kshTexts[barIndex][unitIndex][lineIndex] = '';
+                        if (textLine.startsWith("beat=")) {
+                            kshTexts[barIndex][unitIndex][lineIndex] = "";
                             break;
                         }
                     }
@@ -97,8 +97,8 @@ document.getElementById('run-button').addEventListener('click', () => {
                 if (flag) {
                     for (let i = 0; i < unitData.length; i++) {
                         let textLine = unitData[i];
-                        if (textLine.startsWith('t=')) {
-                            kshTexts[barIndex][unitIndex][lineIndex] = '';
+                        if (textLine.startsWith("t=")) {
+                            kshTexts[barIndex][unitIndex][lineIndex] = "";
                             break;
                         }
                     }
@@ -111,34 +111,34 @@ document.getElementById('run-button').addEventListener('click', () => {
     for (let barIndex = 0; barIndex < kshTexts.length; barIndex++) {
         for (let unitIndex = 0; unitIndex < kshTexts[barIndex].length; unitIndex++) {
             // 空文字や空白だけの行を削除する場合は trim を利用
-            kshTexts[barIndex][unitIndex] = kshTexts[barIndex][unitIndex].filter(line => line.trim() !== '');
+            kshTexts[barIndex][unitIndex] = kshTexts[barIndex][unitIndex].filter(line => line.trim() !== "");
         }
     }
 
-    let newText = '';
+    let newText = "";
     let testadded = false;
     kshTexts.forEach((barData) => {
         barData.forEach((unitData) => {
             unitData.forEach((textLine) => {
-                if (textLine && (textLine !== '')) { // 空行を除外
+                if (textLine && (textLine !== "")) { // 空行を除外
                     testadded = true;
-                    newText += textLine + '\r\n';
+                    newText += textLine + "\r\n";
                 }
             });
         });
         if (testadded) {
-            newText += '--\r\n'; // 小節区切りを追加
+            newText += "--\r\n"; // 小節区切りを追加
         }
     });
     newText = newText.trim(); // 末尾の改行を削除
 
 
     // ダウンロード用のファイル作成
-    const blob = new Blob([bom + newText], { type: 'text/plain; charset=utf-8' }); // UTF-8 を指定
+    const blob = new Blob([bom + newText], { type: "text/plain; charset=utf-8" }); // UTF-8 を指定
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = fileName.replace('.ksh', '-com.ksh'); // ファイル名変更
+    a.download = fileName.replace(".ksh", "-com.ksh"); // ファイル名変更
     a.click();
     URL.revokeObjectURL(url);
 });
