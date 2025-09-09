@@ -132,6 +132,8 @@ document.getElementById("run-button").addEventListener("click", () => {
         }
     });
     newText = newText.trim(); // 末尾の改行を削除
+    newText = newText.replace(/\r?\n/g, "\r\n");
+
 
 
     // ダウンロード用のファイル作成
