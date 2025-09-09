@@ -115,13 +115,19 @@ document.getElementById('run-button').addEventListener('click', () => {
     }
 
     let newText = '';
+    let testadded = false;
     kshTexts.forEach((barData) => {
         barData.forEach((unitData) => {
             unitData.forEach((textLine) => {
-                newText += textLine + '\r\n';
+                if (textLine && (textLine !== '')) { // 空行を除外
+                    testadded = true;
+                    newText += textLine + '\r\n';
+                }
             });
         });
-        newText += '--\r\n'; // 小節区切りを追加
+        if (testadded) {
+            newText += '--\r\n'; // 小節区切りを追加
+        }
     });
 
 
@@ -130,7 +136,7 @@ document.getElementById('run-button').addEventListener('click', () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName.replace('.ksh', '-rem.ksh'); // ファイル名変更
+    a.download = fileName.replace('.ksh', '-com.ksh'); // ファイル名変更
     a.click();
     URL.revokeObjectURL(url);
 });
