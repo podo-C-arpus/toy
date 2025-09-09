@@ -71,7 +71,7 @@ document.getElementById("run-button").addEventListener("click", () => {
             if (delete_beat) { // delete_beat オプションの処理
                 let flag = false;
                 unitData.forEach((textLine, lineIndex) => {
-                    if (textLine.includes("beat=delete")) {
+                    if (textLine.includes("beat=#")) {
                         flag = true;
                         kshTexts[barIndex][unitIndex][lineIndex] = textLine.replace(/beat=#/g, "");
                     }
