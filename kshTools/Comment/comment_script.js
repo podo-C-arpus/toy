@@ -53,6 +53,7 @@ document.getElementById('run-button').addEventListener('click', () => {
 
 
     // 変換処理
+    console.log("処理開始", "delete_slash:", delete_slash, "alter_crlf:", alter_crlf, "delete_beat:", delete_beat, "delete_t:", delete_t);
     kshTexts.forEach((barData, barIndex) => {
         barData.forEach((unitData, unitIndex) => {
             if (delete_slash) { // delete_slash オプションの処理
@@ -129,6 +130,7 @@ document.getElementById('run-button').addEventListener('click', () => {
             newText += '--\r\n'; // 小節区切りを追加
         }
     });
+    newText = newText.trim(); // 末尾の改行を削除
 
 
     // ダウンロード用のファイル作成
