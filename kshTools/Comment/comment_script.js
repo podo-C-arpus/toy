@@ -53,11 +53,12 @@ document.getElementById("run-button").addEventListener("click", () => {
 
 
     // 変換処理
+    console.log(kshTexts);
     console.log("処理開始", "delete_slash:", delete_slash, "alter_crlf:", alter_crlf, "delete_beat:", delete_beat, "delete_t:", delete_t);
     kshTexts.forEach((barData, barIndex) => {
         barData.forEach((unitData, unitIndex) => {
             if (delete_slash) { // delete_slash オプションの処理
-                const double_slash = /^\/{2,}#/;
+                const double_slash = /^\uFEFF?\/{2,}#/;
                 unitData.forEach((textLine, lineIndex) => {
                     kshTexts[barIndex][unitIndex][lineIndex] = textLine.replace(double_slash, ""); // #付きのものを削除
                 });
