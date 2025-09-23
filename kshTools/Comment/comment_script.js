@@ -5,6 +5,7 @@ document.getElementById("run-button").addEventListener("click", () => {
 	
     // 入力値を取得
     const delete_slash = document.getElementById("delete_slash").checked;
+    const cmopletion_pipe = document.getElementById("cmopletion_pipe").checked;
     const alter_crlf = document.getElementById("alter_crlf").checked;
     const delete_beat = document.getElementById("delete_beat").checked;
     const delete_t = document.getElementById("delete_t").checked;
@@ -63,6 +64,16 @@ document.getElementById("run-button").addEventListener("click", () => {
                     kshTexts[barIndex][unitIndex][lineIndex] = textLine.replace(double_slash, ""); // #付きのものを削除
                 });
             }
+            if (cmopletion_pipe) { // cmopletion_pipe オプションの処理
+                const pipe_test = /[012]{4}#[012]{2}#[0-9A-Za-o\-:]{2}/g;
+                const hash_replace = /#/g;
+                unitData.forEach((textLine, lineIndex) => {
+                    const replaced = textLine.replace(pipe_test, (match) => {
+                        return match.replace(hash_replace, "|");
+                    });
+                    kshTexts[barIndex][unitIndex][lineIndex] = replaced;
+                });
+            }
             if (alter_crlf) { // alter_crlf オプションの処理
                 unitData.forEach((textLine, lineIndex) => {
                     kshTexts[barIndex][unitIndex][lineIndex] = textLine.replace(/CRLF/g, "\r\n");
@@ -106,6 +117,7 @@ document.getElementById("run-button").addEventListener("click", () => {
                     }
                 }
             }
+
         });
     });
 
@@ -134,6 +146,7 @@ document.getElementById("run-button").addEventListener("click", () => {
     });
     newText = newText.trim(); // 末尾の改行を削除
     newText = newText.replace(/\r?\n/g, "\r\n");
+    newText = newText.replace(/\r\n--$/, ""); // 末尾の--を削除
 
 
 
