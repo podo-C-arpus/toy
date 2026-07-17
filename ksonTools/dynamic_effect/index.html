@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="KSON の param_change 命令列を生成するツール">
-    <title>擬似時間変化エフェクト | ksonTools</title>
+    <title>時間変化エフェクト | ksonTools</title>
     <link rel="stylesheet" href="../utilities/style.css">
     <style>
       .tool-options.is-disabled,
@@ -20,30 +20,70 @@
       <a class="site-name" href="../ksonTools.html">ksonTools</a>
       <nav aria-label="パンくず">
         <a href="../ksonTools.html">ツール一覧</a>
-        <span aria-current="page">擬似時間変化エフェクト</span>
+        <span aria-current="page">時間変化エフェクト</span>
       </nav>
     </header>
 
     <main class="tool-page">
       <section class="tool-introduction" aria-labelledby="tool-title">
-        <h1 id="tool-title">擬似時間変化エフェクト</h1>
-        <p>KSON の <code>audio.audio_effect.*.param_change</code> 用に、一定間隔で値を上書きする命令列を生成します。</p>
+        <h1 id="tool-title">時間変化エフェクト</h1>
+        <p>エフェクトのパラメータを時間とともに変化させる命令列を生成します。</p>
         <details class="tool-help">
           <summary>使い方</summary>
           <div class="tool-help-content">
             <ol>
-              <li>対象、エフェクト名、パラメータを指定します。</li>
-              <li>始点・終点、長さ、更新間隔、カーブを設定します。</li>
-              <li>生成結果を既存の .kson 譜面の <code>param_change</code> に貼り付けます。</li>
+              <li>対象を選択し、エフェクト名を入力します（ユーザー定義エフェクトを推奨）。</li>
+              <li>時間変化させるパラメータ名を検索して選択します。</li>
+              <li>始点値・終点値・長さ・更新間隔などを設定します。</li>
+              <li>「実行」を押し、<code>dynamic_effect.kson</code> をダウンロードします。</li>
+              <li>K-Shoot Editorでファイルを開き、生成された内容を使用する譜面へコピー＆ペーストします。</li>
             </ol>
           </div>
         </details>
         <details class="tool-help">
           <summary>注意点</summary>
           <div class="tool-help-content">
-            <p>開始 pulse は常に 960 です。ノーツ、BGM、背景などは出力に含めません。</p>
-            <p>カタログ外のエフェクト名・パラメータ名は明示的なカスタム入力として利用できます。</p>
-            <p>カーブは放物線で補間します。</p>
+            <h3>出力位置</h3>
+            <p>2小節目の先頭、すなわち960Yからパラメータ変更命令を作成します。</p>
+
+            <h3>パラメータ</h3>
+            <p>パラメータ名の候補には、KSONで使用可能なすべてのパラメータを収録しています。ただし、本ツールでは時間変化させることが効果的な一部のパラメータのみ対応しています。対象外のパラメータを選択すると、変化の設定と実行が無効になります。</p>
+
+            <h3>始点値と終点値</h3>
+            <p>始点値と終点値には、KSONフォーマットで許可される形式のうち、K-Shoot Editorから入力可能な形式を使用できます。パラメータに応じた単位を正しく付けてください。単位がない場合や異なる単位を付けた場合、実行できません。</p>
+            <p>値が許容範囲を超えている場合も実行できません。入力値の自動補正は行いません。</p>
+
+            <h3>長さと更新間隔</h3>
+            <p>長さと更新間隔には小数を入力できます。小節、拍、Yのいずれかで入力し、内部ではYに換算して計算します。</p>
+            <p>Yが整数にならない値も使用できますが、命令を出力する位置は四捨五入して整数Yにします。更新間隔ごとに命令の挿入を試みますが、丸め後のパラメータ値が直前の命令と同じ場合、その命令は削除します。そのため、実際に出力される命令の間隔が設定した更新間隔より広くなることがあります。</p>
+            <p>「終点に命令を挿入」は、長さが更新間隔の倍数である場合に使用できます。</p>
+
+            <h3>カーブ</h3>
+            <p>カーブには、直線とべき関数による補間を使用します。いずれも始点を <code>(0, 0)</code>、終点を <code>(1, 1)</code> として計算します。</p>
+            <ul>
+              <li>直線：<code>x</code></li>
+              <li>ファーストカーブ：<code>√x</code>。開始直後に大きく変化し、その後は緩やかに変化します。</li>
+              <li>スローカーブ：<code>x²</code>。開始時は緩やかで、終点に近づくほど大きく変化します。</li>
+            </ul>
+
+            <h3>精度モード</h3>
+            <p>標準精度では、整数型を整数に四捨五入し、小数型を小数点以下3桁に四捨五入します。</p>
+            <p>概数では、<code>samples</code> と <code>Hz</code> は1の位を四捨五入して10単位に丸めます。<code>hi_cut_gain</code>、<code>pitch</code>、<code>q</code>、<code>ratio</code> は整数相当の値に丸めます。</p>
+            <p>標準精度と概数で結果が変わらないパラメータでは、精度モードを選択できません。</p>
+
+            <h3>Off時の値</h3>
+            <p><code>mix</code> と <code>ratio</code> では、あらかじめ定義されたOff時の固定値を命令に付加できます。Off値自体を入力したり、時間変化させたりすることはできません。</p>
+
+            <h3>実行と命令数</h3>
+            <p>入力に問題がなければ、「実行」を押すと <code>dynamic_effect.kson</code> がダウンロードされます。</p>
+            <p>命令数が多い場合は、ダウンロード前に警告を表示します。警告後も続行できますが、命令数が多い譜面はK-Shoot Editorでの編集や再生処理が重くなる可能性があります。</p>
+
+            <h3>変化終了後の値</h3>
+            <p>時間変化区間の終了後も、最後に設定したパラメータ値は保持されます。元の値へ戻す命令が必要な場合は、譜面へ別途追加してください。</p>
+            <p>特に、<code>mix</code> を <code>0%</code> まで下げた後、同じ名前のエフェクトを再び使用する場合は注意してください。</p>
+
+            <h3>動作確認環境</h3>
+            <p>本ツールは、K-Shoot MANIA v2.0.1およびK-Shoot Editor v2.1.0を使用して開発・動作確認しています。異なるバージョンでは、エフェクトやパラメータの仕様が異なる可能性があります。</p>
           </div>
         </details>
       </section>

@@ -210,9 +210,9 @@ function validateAndReadSettings() {
 function confirmLargeOutput(commandCount) {
   if (commandCount <= 100) return true;
   if (commandCount <= 1000) {
-    return window.confirm(`正味の命令数は${commandCount}件です。ファイルサイズが大きくなる可能性があります。続行しますか？`);
+    return window.confirm(`命令数は${commandCount}件です。ファイルサイズが大きくなる可能性があります。続行しますか？`);
   }
-  return window.confirm(`警告: 正味の命令数は${commandCount}件です。処理負荷やファイルサイズが大きくなる可能性があります。本当に続行しますか？`);
+  return window.confirm(`警告: 命令数は${commandCount}件です。処理負荷やファイルサイズが大きくなる可能性があります。本当に続行しますか？`);
 }
 
 async function loadBlankKson() {
@@ -233,7 +233,7 @@ form.addEventListener("submit", async (event) => {
   const settings = validation.settings;
   const commands = generateCommands(settings);
   if (!confirmLargeOutput(commands.length)) {
-    showMessages([`正味の命令数は${commands.length}件です。出力をキャンセルしました。`]);
+    showMessages([`命令数は${commands.length}件です。出力をキャンセルしました。`]);
     status.textContent = "出力をキャンセルしました。";
     return;
   }
