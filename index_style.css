@@ -15,10 +15,6 @@ body {
   line-height: 1.5;
 }
 
-a {
-  color: #175db3;
-}
-
 .site-header,
 .site-footer {
   padding: 0.75rem max(1.25rem, calc((100% - 58rem) / 2));
@@ -40,32 +36,15 @@ a {
 }
 
 .portal-introduction,
-.tool-section,
-.portal-notes {
+.portal-section {
   padding: 1.2rem 1.35rem;
   border: 1px solid #dce2ea;
   border-radius: 0.75rem;
   background: #ffffff;
 }
 
-.portal-introduction {
-  margin-bottom: 0.85rem;
-}
-
-.portal-notes {
+.portal-section {
   margin-top: 0.85rem;
-}
-
-.portal-notes h2 {
-  margin-bottom: 0.65rem;
-}
-
-.portal-notes p {
-  margin-bottom: 0.55rem;
-}
-
-.portal-notes p:last-child {
-  margin-bottom: 0;
 }
 
 .eyebrow {
@@ -74,7 +53,6 @@ a {
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 h1,
@@ -90,7 +68,7 @@ h1 {
 }
 
 h2 {
-  margin-bottom: 0;
+  margin-bottom: 0.85rem;
   font-size: 1.2rem;
 }
 
@@ -98,27 +76,16 @@ h2 {
   margin-bottom: 0;
 }
 
-.section-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.85rem;
-}
-
-.tool-count {
-  margin-bottom: 0;
-  color: #647184;
-  font-size: 0.85rem;
-}
-
-.tool-list {
+.link-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.tool-card {
+.link-list li {
   min-width: 0;
   border: 1px solid #dce2ea;
   border-radius: 0.65rem;
@@ -126,14 +93,14 @@ h2 {
   transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
 
-.tool-card:hover,
-.tool-card:focus-within {
+.link-list li:hover,
+.link-list li:focus-within {
   border-color: #8cb3e2;
   box-shadow: 0 0.35rem 1rem rgb(28 36 48 / 10%);
   transform: translateY(-1px);
 }
 
-.tool-card a {
+.link-list a {
   display: block;
   height: 100%;
   padding: 1rem;
@@ -141,44 +108,30 @@ h2 {
   text-decoration: none;
 }
 
-.tool-card h3 {
-  margin: 0 0 0.35rem;
-  color: #175db3;
-  font-size: 1.05rem;
+.link-list strong,
+.link-list span {
+  display: block;
 }
 
-.tool-card p {
-  margin: 0;
+.link-list strong {
+  margin-bottom: 0.3rem;
+  color: #175db3;
+}
+
+.link-list span {
   color: #52606f;
   font-size: 0.9rem;
 }
 
-.loading-message,
-.status-message {
-  margin-bottom: 0;
-  color: #647184;
-  font-size: 0.9rem;
+.featured-link {
+  border-color: #8cb3e2 !important;
+  background: #f5f9ff !important;
 }
 
 .site-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1.25rem;
   border-top: 1px solid #dce2ea;
-  font-size: 0.85rem;
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem 1rem;
-}
-
-.legacy-link {
   color: #647184;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
 }
 
 @media (max-width: 38rem) {
@@ -188,13 +141,7 @@ h2 {
   }
 
   .portal-introduction,
-  .tool-section,
-  .portal-notes {
+  .portal-section {
     padding: 1rem;
-  }
-
-  .site-footer {
-    align-items: flex-start;
-    flex-direction: column;
   }
 }

@@ -1,58 +1,50 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Arpusが公開しているパッケージやツールのポータルページ">
     <title>Arpusのおもちゃ箱</title>
-    <link rel="stylesheet" href="index_style.css">
-</head>
-<body>
-    <h1>Arpusのおもちゃ箱</h1>
+    <link rel="stylesheet" href="./index_style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <span class="site-name">Arpusのおもちゃ箱</span>
+    </header>
 
-    <h2>K-Shoot MANIA Packages</h2>
-    <ul>
-        <li><a href="https://drive.google.com/drive/folders/1jUC1MET1L1Rfae15q8s1EMYnsXoVO6xW?usp=drive_link">WAYANIOriginal</a></li>
-        <li><a href="./Package002/Package002.html">Package002(いつか作るかも)</a></li>
-        <li><a href="./Package003/Package003.html">Package003(いつか作るかも)</a></li>
-    </ul>
+    <main class="portal-page">
+      <section class="portal-introduction" aria-labelledby="portal-title">
+        <p class="eyebrow">PORTAL</p>
+        <h1 id="portal-title">Arpusのおもちゃ箱</h1>
+        <p>公開しているパッケージやツールをまとめています。</p>
+      </section>
 
-    <h2>K-Shoot MANIA Tools</h2>
-    <li><a href="./kshTools/kshTools.html">kshTools</a></li>
-    <div id="tool-list">ツール一覧を読み込み中…</div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // ★ フェッチ先をサブフォルダ内に変更
-            fetch('kshTools/kshTools.html')
-                .then(res => res.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const tools = doc.querySelector('#tool-list');
-                    if (tools) {
-                        const container = document.getElementById('tool-list');
-                        container.innerHTML = tools.innerHTML;
-                        // リンクを index.html から参照できるように補正
-                        container.querySelectorAll('a').forEach(a => {
-                            const href = a.getAttribute('href');
-                            // "./foo/bar" → "kshTools/foo/bar"
-                            a.setAttribute('href', href.replace(/^\.\//, 'kshTools/'));
-                        });
-                    } else {
-                        console.error('ツール一覧要素が見つかりません');
-                    }
-                })
-                .catch(err => {
-                    console.error('ツール一覧の読み込みに失敗しました', err);
-                    document.getElementById('tool-list').textContent = 'ツール一覧の読み込みに失敗しました';
-                });
-        });
-    </script>
+      <section class="portal-section" aria-labelledby="packages-title">
+        <h2 id="packages-title">K-Shoot MANIA Packages</h2>
+        <ul class="link-list">
+          <li><a href="https://drive.google.com/drive/folders/1jUC1MET1L1Rfae15q8s1EMYnsXoVO6xW?usp=drive_link"><strong>WAYANIOriginal</strong><span>K-Shoot Mania v1 向けパッケージ（v2.0.0以降、譜面が正常に動作しません）</span></a></li>
+          <li><a href="./Package002/Package002.html"><strong>Package002</strong><span>いつか作るかも</span></a></li>
+          <li><a href="./Package003/Package003.html"><strong>Package003</strong><span>いつか作るかも</span></a></li>
+        </ul>
+      </section>
 
-    <h2>Minecraft Tools</h2>
-    <ul>
-        <li><a href="./mcTools/Translate/Translate.html">(たぶん作らない)</a></li>
-    </ul>
+      <section class="portal-section" aria-labelledby="ksm-tools-title">
+        <h2 id="ksm-tools-title">K-Shoot MANIA Tools</h2>
+        <ul class="link-list">
+          <li class="featured-link"><a href="./ksonTools/ksonTools.html"><strong>Arpusのおもちゃ箱v2</strong><span>KSON譜面の制作や編集を支援するブラウザーツール</span></a></li>
+        </ul>
+      </section>
 
-    <footer></footer>
-</body>
+      <!-- 将来公開する場合は hidden 属性を外す -->
+      <section class="portal-section" aria-labelledby="minecraft-tools-title" hidden>
+        <h2 id="minecraft-tools-title">Minecraft Tools</h2>
+        <ul class="link-list">
+          <li><a href="./mcTools/Translate/Translate.html"><strong>翻訳ツール</strong><span>たぶん作らない</span></a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">Arpusのおもちゃ箱</footer>
+  </body>
 </html>
 
