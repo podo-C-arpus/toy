@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="K-Shoot MANIA v2 の .kson 譜面作成支援ツール">
+    <title>ツール名 | ksonTools</title>
+    <link rel="stylesheet" href="../utilities/style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-name" href="../ksonTools.html">ksonTools</a>
+      <nav aria-label="パンくず">
+        <a href="../ksonTools.html">ツール一覧</a>
+        <span aria-current="page">ツール名</span>
+      </nav>
+    </header>
+
+    <main class="tool-page">
+      <section class="tool-introduction" aria-labelledby="tool-title">
+        <h1 id="tool-title">ツール名</h1>
+        <p>このツールが行う処理を、一行で簡潔に説明します。</p>
+
+        <details class="tool-help">
+          <summary>使い方</summary>
+          <div class="tool-help-content">
+            <p>通常の利用手順を、短く順番に説明します。</p>
+            <ol>
+              <li>.kson ファイルを選択します。</li>
+              <li>必要に応じて設定を変更します。</li>
+              <li>実行後、結果を確認してダウンロードします。</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="tool-help">
+          <summary>注意点</summary>
+          <div class="tool-help-content">
+            <p>処理はブラウザ内で完結し、選択したファイルはアップロードされません。</p>
+            <p>対象外の譜面構造、未対応の条件、処理結果を確認すべき場合を記載します。</p>
+          </div>
+        </details>
+      </section>
+
+      <form id="tool-form" novalidate>
+        <section class="file-section" aria-labelledby="file-heading">
+          <h2 id="file-heading">.kson ファイルを読み込む</h2>
+          <input id="file-input" type="file" accept=".kson,application/json" hidden>
+          <div id="drop-zone" role="button" tabindex="0" aria-describedby="file-name">
+            <p id="file-name" aria-live="polite">.ksonファイルをここへドロップ、またはクリックして選択</p>
+            <dl id="file-metadata" class="file-metadata" hidden>
+              <div>
+                <dt>タイトル</dt>
+                <dd data-meta-title>未設定</dd>
+              </div>
+              <div>
+                <dt>難易度</dt>
+                <dd data-meta-difficulty>未設定</dd>
+              </div>
+              <div>
+                <dt>譜面制作者</dt>
+                <dd data-meta-chart-author>未設定</dd>
+              </div>
+              <div>
+                <dt>レベル</dt>
+                <dd data-meta-level>未設定</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <fieldset class="tool-options">
+          <legend>設定</legend>
+          <p class="form-field">
+            <label for="text-option">テキスト入力</label>
+            <input id="text-option" name="text-option" type="text" placeholder="例: 出力名の末尾">
+          </p>
+          <p class="form-field">
+            <label for="number-option">数値入力</label>
+            <input id="number-option" name="number-option" type="number" value="1" min="1" step="1">
+          </p>
+          <p class="form-field">
+            <label for="searchable-option">検索付き選択</label>
+            <select id="searchable-option" name="searchable-option" data-searchable-select>
+              <option value="default">標準</option>
+              <option value="center-split">center_split</option>
+              <option value="laser-effect">レーザーエフェクト</option>
+              <option value="zoom-side">zoom_side</option>
+            </select>
+          </p>
+          <div class="form-field">
+            <span>動作モード</span>
+            <div class="choice-group" role="radiogroup" aria-label="動作モード">
+              <label><input type="radio" name="mode-option" value="standard" checked> 標準</label>
+              <label><input type="radio" name="mode-option" value="mode-a"> モード A</label>
+              <label><input type="radio" name="mode-option" value="mode-b"> モード B</label>
+            </div>
+          </div>
+          <div class="form-field">
+            <span>追加オプション</span>
+            <div class="choice-group" role="group" aria-label="追加オプション">
+              <label><input type="checkbox" name="extra-option" value="option-a"> オプション A</label>
+              <label><input type="checkbox" name="extra-option" value="option-b"> オプション B</label>
+              <label><input type="checkbox" name="extra-option" value="option-c"> オプション C</label>
+            </div>
+          </div>
+          <div class="form-field" data-length-unit-control>
+            <span>長さ</span>
+            <div class="length-inputs">
+              <label>
+                <span class="visually-hidden">長さの単位</span>
+                <select data-length-unit aria-label="長さの単位">
+                  <option value="measure">小節 (4/4)</option>
+                  <option value="beat">拍 (1/4)</option>
+                  <option value="y">Y (1/960)</option>
+                </select>
+              </label>
+              <label>
+                <span class="visually-hidden">長さ</span>
+                <input data-length-value type="number" value="1" step="any" inputmode="decimal" aria-label="長さ">
+                <input data-length-y-value type="hidden" value="960">
+              </label>
+            </div>
+          </div>
+          <div class="form-field form-field-range" data-range-unit-control>
+            <span>適用範囲</span>
+            <div class="range-inputs">
+              <label>
+                <span class="visually-hidden">単位</span>
+                <select data-range-unit aria-label="適用範囲の単位">
+                  <option value="all" selected>全区間</option>
+                  <option value="measure">小節番号</option>
+                  <option value="pulse">Y</option>
+                </select>
+              </label>
+              <label>
+                <span data-range-start-label>開始小節</span>
+                <input data-range-start type="number" value="1" min="1" step="1">
+              </label>
+              <label>
+                <span data-range-end-label>終了小節</span>
+                <input data-range-end type="number" value="1" min="1" step="1">
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <section class="action-section" aria-label="処理の実行">
+          <span id="execution-indicator" class="execution-indicator" role="status" aria-label="処理中" hidden></span>
+          <button id="run-button" type="submit" disabled>実行</button>
+        </section>
+      </form>
+
+      <section class="result-section" aria-labelledby="result-heading">
+        <h2 id="result-heading">結果</h2>
+        <p id="status-message" role="status" aria-live="polite">ファイルを選択してください。</p>
+        <div id="execution-messages" class="execution-messages" hidden>
+          <ul id="message-list"></ul>
+        </div>
+        <div id="result-content" hidden></div>
+        <button id="download-button" type="button" hidden>ダウンロード</button>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a href="../NOTICE.md">NOTICE</a>
+      <a href="../../LICENSE">MIT License</a>
+      <a href="https://github.com/kshootmania/ksm-v2">K-Shoot MANIA v2</a>
+    </footer>
+
+    <script type="module" src="../utilities/form.js"></script>
+    <script type="module" src="../utilities/template.js"></script>
+    <!-- 実ツールでは、この行を ./script.js に置き換える -->
+    <script type="module" src="../utilities/template-script.js"></script>
+  </body>
+</html>

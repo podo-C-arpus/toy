@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="KSON の param_change 命令列を生成するツール">
+    <title>擬似時間変化エフェクト | ksonTools</title>
+    <link rel="stylesheet" href="../utilities/style.css">
+    <style>
+      .tool-options.is-disabled,
+      #off-value-control.is-disabled,
+      #insert-end-command-control.is-disabled,
+      #precision-control.is-disabled {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-name" href="../ksonTools.html">ksonTools</a>
+      <nav aria-label="パンくず">
+        <a href="../ksonTools.html">ツール一覧</a>
+        <span aria-current="page">擬似時間変化エフェクト</span>
+      </nav>
+    </header>
+
+    <main class="tool-page">
+      <section class="tool-introduction" aria-labelledby="tool-title">
+        <h1 id="tool-title">擬似時間変化エフェクト</h1>
+        <p>KSON の <code>audio.audio_effect.*.param_change</code> 用に、一定間隔で値を上書きする命令列を生成します。</p>
+        <details class="tool-help">
+          <summary>使い方</summary>
+          <div class="tool-help-content">
+            <ol>
+              <li>対象、エフェクト名、パラメータを指定します。</li>
+              <li>始点・終点、長さ、更新間隔、カーブを設定します。</li>
+              <li>生成結果を既存の .kson 譜面の <code>param_change</code> に貼り付けます。</li>
+            </ol>
+          </div>
+        </details>
+        <details class="tool-help">
+          <summary>注意点</summary>
+          <div class="tool-help-content">
+            <p>開始 pulse は常に 960 です。ノーツ、BGM、背景などは出力に含めません。</p>
+            <p>カタログ外のエフェクト名・パラメータ名は明示的なカスタム入力として利用できます。</p>
+            <p>カーブは放物線で補間します。</p>
+          </div>
+        </details>
+      </section>
+
+      <form id="tool-form" novalidate>
+        <fieldset class="tool-options">
+          <legend>対象</legend>
+          <div class="form-field">
+            <span>対象</span>
+            <div class="choice-group" role="radiogroup" aria-label="対象">
+              <label><input type="radio" name="target" value="laser" checked> laser</label>
+              <label><input type="radio" name="target" value="fx"> fx</label>
+            </div>
+          </div>
+          <p class="form-field">
+            <label for="effect-name">エフェクト名</label>
+            <input id="effect-name" name="effect-name" type="text" required autocomplete="off" placeholder="例: custom_effect">
+          </p>
+          <p class="form-field">
+            <label for="parameter-name">パラメータ名</label>
+            <input id="parameter-name" name="parameter-name" type="search" list="parameter-candidates" required autocomplete="off" placeholder="例: mix">
+            <datalist id="parameter-candidates"></datalist>
+          </p>
+          <p id="parameter-support-message" class="notice" role="status" hidden></p>
+        </fieldset>
+
+        <fieldset class="tool-options" id="change-options">
+          <legend>変化の設定</legend>
+          <p class="form-field"><label for="start-value">始点値</label><input id="start-value" type="text" required placeholder="例: 1.0"></p>
+          <p class="form-field"><label for="end-value">終点値</label><input id="end-value" type="text" required placeholder="例: 1.0"></p>
+          <div class="form-field" data-length-unit-control>
+            <span>長さ</span>
+            <div class="length-inputs">
+              <label><span class="visually-hidden">長さの単位</span><select id="length-unit" data-length-unit><option value="measure">小節 (4/4)</option><option value="beat">拍 (1/4)</option><option value="y">Y (1/960)</option></select></label>
+              <label><span class="visually-hidden">長さ</span><input id="length-value" data-length-value type="number" value="1" min="0" step="any" inputmode="decimal" required></label>
+              <input id="length-y-value" data-length-y-value type="hidden" value="960">
+            </div>
+          </div>
+          <div class="form-field" data-length-unit-control>
+            <span>更新間隔</span>
+            <div class="length-inputs">
+              <label><span class="visually-hidden">更新間隔の単位</span><select id="interval-unit" data-length-unit><option value="measure">小節 (4/4)</option><option value="beat">拍 (1/4)</option><option value="y" selected>Y (1/960)</option></select></label>
+              <label><span class="visually-hidden">更新間隔</span><input id="interval-value" data-length-value type="number" value="20" min="0" step="any" inputmode="decimal" required></label>
+              <input id="interval-y-value" data-length-y-value type="hidden" value="20">
+            </div>
+          </div>
+          <div id="insert-end-command-control" class="form-field">
+            <span>終点</span>
+            <div class="choice-group" role="group" aria-label="終点の命令">
+              <label><input id="insert-end-command" type="checkbox" checked> 終点に命令を挿入</label>
+            </div>
+          </div>
+          <div class="form-field">
+            <span>カーブ</span>
+            <div class="choice-group" role="radiogroup" aria-label="カーブ">
+              <label><input type="radio" name="curve" value="1" checked> 直線</label>
+              <label><input type="radio" name="curve" value="0.5"> ファーストカーブ</label>
+              <label><input type="radio" name="curve" value="2"> スローカーブ</label>
+            </div>
+          </div>
+          <div id="precision-control" class="form-field">
+            <span>精度モード</span>
+            <div class="choice-group" role="radiogroup" aria-label="精度モード">
+              <label><input type="radio" name="precision" value="standard" checked> 標準精度</label>
+              <label><input type="radio" name="precision" value="approximate"> 概数</label>
+            </div>
+          </div>
+          <div id="off-value-control" class="form-field is-disabled" aria-disabled="true">
+            <span>Off 時の値</span>
+            <div class="choice-group" role="group" aria-label="Off 時の値">
+              <label><input id="use-off-value" type="checkbox" disabled> Off 時の値を使用する</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <section class="action-section" aria-label="処理の実行">
+          <button id="run-button" type="submit">実行</button>
+        </section>
+      </form>
+
+      <section class="result-section" aria-labelledby="result-heading">
+        <h2 id="result-heading">結果</h2>
+        <p id="status-message" role="status" aria-live="polite">入力内容を設定してください。</p>
+        <div id="execution-messages" class="execution-messages" hidden><ul id="message-list"></ul></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a href="../NOTICE.md">NOTICE</a>
+      <a href="../../LICENSE">MIT License</a>
+      <a href="https://github.com/kshootmania/ksm-v2">K-Shoot MANIA v2</a>
+    </footer>
+    <script type="module" src="../utilities/form.js"></script>
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
