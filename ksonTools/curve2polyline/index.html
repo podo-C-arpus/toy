@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="tool-title" content="折れ線化ツール">
+    <meta name="description" content="ksonファイル内の曲線を、折れ線データへ変換するツール。">
+    <title>折れ線化ツール | ksonTools</title>
+    <link rel="stylesheet" href="../utilities/style.css">
+    <style>
+      .tool-options:disabled,
+      #split-mode-control.is-disabled,
+      #balance-control.is-disabled {
+        opacity: 0.5;
+      }
+
+      .target-row > span {
+        min-width: 5.5rem;
+      }
+
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-name" href="../ksonTools.html">Arpusのおもちゃ箱v2</a>
+      <nav aria-label="パンくず">
+        <a href="../ksonTools.html">ツール一覧</a>
+        <span aria-current="page">折れ線化ツール</span>
+      </nav>
+    </header>
+
+    <main class="tool-page">
+      <section class="tool-introduction" aria-labelledby="tool-title">
+        <h1 id="tool-title">折れ線化ツール</h1>
+        <p>ksonファイル内の曲線を、折れ線データへ変換するツール。</p>
+
+        <details class="tool-help">
+          <summary>使い方</summary>
+          <div class="tool-help-content">
+            <ol>
+              <li>変換する <code>.kson</code> ファイルを選択します。</li>
+              <li>処理する範囲と適用対象を選択します。</li>
+              <li>変換精度と分割方法を設定します。</li>
+              <li>「実行」を押すと、変換済みファイルがダウンロードされます。</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="tool-help">
+          <summary>注意点</summary>
+          <div class="tool-help-content">
+            <h3>適用範囲</h3>
+            <p>選択範囲内に始点がある曲線を変換します。終点が範囲外にある場合も、そのセグメント全体が処理対象になります。</p>
+
+            <h3>曲線補間の再現精度</h3>
+            <p>本ツールでは、二次ベジェ曲線として補間を再現しています。確認した限りKSMにおける補間値と6桁一致しています。</p>
+            <p>KSMのGitHub上のコードとの照合は行っていませんが、実用上十分な精度が得られたため良しとしています。</p>
+
+            <h3>精度</h3>
+            <p>1/4音符単位から順に1/8, 1/16, 1/32, 1/64, 1/192と分割を進めます。分割精度の上限として簡易(1/16)・標準(1/64)・詳細(1/192)の3段階を用意しています。</p>
+            <p>K-Shoot Mania(v2.0.1)の曲線描画では、1/64単位を用いていると見られます。</p>
+            <p>過剰な分割を「抑制する」では十分な精度に達した区間をそれ以上分割しません。</p>
+            <p>「強制的に分割」では上限まで強制的に分割します。</p>
+            <p>いずれの場合も、直線の場合は分割しません。aとbが十分に近い疑似直線も分割しません。</p>
+            <p>判定バランス「標準」は、BPM150～200程度で自然に動作する設定です。</p>
+            <p>急な変化側を滑らかにしたい場合は「高BPM」側、緩やかな変化側を滑らかにしたい場合は「低BPM」側をお試しください。</p>
+
+            <h3>数値の丸め</h3>
+            <p>新しく追加する中間点は、K Shoot Editor(v2.1.0)の入力制限に従って丸められます。</p>
+            <p>丸め処理後、連続する区間が同一直線となる場合は、間の追加頂点を取り除きます。元の始点と終点は変更されません。</p>
+
+            <h3>ファイルの取り扱い</h3>
+            <p>処理はブラウザ内で完結し、選択したファイルはアップロードされません。元のファイルは変更せず、変換結果を別ファイルとして出力します。</p>
+          </div>
+        </details>
+      </section>
+
+      <form id="tool-form" novalidate>
+        <section class="file-section" aria-labelledby="file-heading">
+          <h2 id="file-heading">.kson ファイルを読み込む</h2>
+          <input id="file-input" type="file" accept=".kson,application/json" hidden>
+          <div id="drop-zone" role="button" tabindex="0" aria-describedby="file-name">
+            <p id="file-name" aria-live="polite">.ksonファイルをここへドロップ、またはクリックして選択</p>
+            <dl id="file-metadata" class="file-metadata" hidden>
+              <div>
+                <dt>タイトル</dt>
+                <dd data-meta-title>未設定</dd>
+              </div>
+              <div>
+                <dt>難易度</dt>
+                <dd data-meta-difficulty>未設定</dd>
+              </div>
+              <div>
+                <dt>譜面制作者</dt>
+                <dd data-meta-chart-author>未設定</dd>
+              </div>
+              <div>
+                <dt>レベル</dt>
+                <dd data-meta-level>未設定</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <fieldset id="scope-options" class="tool-options" disabled>
+          <legend>範囲・対象指定</legend>
+
+          <div class="form-field form-field-range" data-range-unit-control>
+            <span>適用範囲</span>
+            <div class="range-inputs">
+              <label>
+                <span class="visually-hidden">単位</span>
+                <select id="range-unit" data-range-unit aria-label="適用範囲の単位">
+                  <option value="all" selected>全区間</option>
+                  <option value="measure">小節番号</option>
+                  <option value="pulse">Y</option>
+                </select>
+              </label>
+              <label>
+                <span data-range-start-label>開始小節</span>
+                <input id="range-start" data-range-start type="number" value="1" min="1" step="1" inputmode="numeric">
+              </label>
+              <label>
+                <span data-range-end-label>終了小節</span>
+                <input id="range-end" data-range-end type="number" value="1" min="1" step="1" inputmode="numeric">
+              </label>
+            </div>
+          </div>
+
+          <div class="form-field target-row">
+            <span>レーザー</span>
+            <div class="choice-group" role="group" aria-label="レーザーの適用対象">
+              <label><input type="checkbox" name="target" value="laser-left" checked> 左</label>
+              <label><input type="checkbox" name="target" value="laser-right" checked> 右</label>
+            </div>
+          </div>
+
+          <div class="form-field target-row">
+            <span>カメラ</span>
+            <div class="choice-group" role="group" aria-label="カメラの適用対象">
+              <label><input type="checkbox" name="target" value="camera-top" checked> top</label>
+              <label><input type="checkbox" name="target" value="camera-bottom" checked> bottom</label>
+              <label><input type="checkbox" name="target" value="camera-side" checked> side</label>
+              <label><input type="checkbox" name="target" value="camera-tilt" checked> tilt</label>
+              <label><input type="checkbox" name="target" value="camera-rotation" checked> rotation</label>
+              <label><input type="checkbox" name="target" value="camera-split" checked> split</label>
+            </div>
+          </div>
+
+          <div class="form-field target-row">
+            <span>その他</span>
+            <div class="choice-group" role="group" aria-label="その他の適用対象">
+              <label><input type="checkbox" name="target" value="scroll-speed" checked> scroll_speed</label>
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset id="mode-options" class="tool-options" disabled>
+          <legend>動作モード</legend>
+
+          <div class="form-field">
+            <span>精度</span>
+            <div class="choice-group" role="radiogroup" aria-label="変換精度">
+              <label><input type="radio" name="precision" value="simple"> 簡易（1/16）</label>
+              <label><input type="radio" name="precision" value="standard" checked> 標準（1/64）</label>
+              <label><input type="radio" name="precision" value="detailed"> 詳細（1/192）</label>
+            </div>
+          </div>
+
+          <div id="split-mode-control" class="form-field is-disabled" aria-disabled="true">
+            <span>過剰な分割</span>
+            <div class="choice-group" role="radiogroup" aria-label="過剰な分割の扱い">
+              <label><input type="radio" name="split-mode" value="suppress" checked disabled> 抑制する</label>
+              <label><input type="radio" name="split-mode" value="force" disabled> 強制的に分割</label>
+            </div>
+          </div>
+
+          <div id="balance-control" class="form-field is-disabled" aria-disabled="true">
+            <span>判定バランス</span>
+            <div class="choice-group" role="radiogroup" aria-label="BPMと曲線形状に応じた判定バランス">
+              <label><input type="radio" name="angle-scale-multiplier" value="0.5" disabled> 高BPM</label>
+              <label><input type="radio" name="angle-scale-multiplier" value="0.707107" disabled> やや高BPM</label>
+              <label><input type="radio" name="angle-scale-multiplier" value="1" checked disabled> 標準</label>
+              <label><input type="radio" name="angle-scale-multiplier" value="1.414214" disabled> やや低BPM</label>
+              <label><input type="radio" name="angle-scale-multiplier" value="2" disabled> 低BPM</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <section class="action-section" aria-label="処理の実行">
+          <button id="run-button" type="submit" disabled>実行</button>
+        </section>
+      </form>
+
+      <section class="result-section" aria-labelledby="result-heading">
+        <h2 id="result-heading">結果</h2>
+        <p id="status-message" role="status" aria-live="polite">ファイルを選択してください。</p>
+        <div id="execution-messages" class="execution-messages" hidden>
+          <ul id="message-list"></ul>
+        </div>
+        <div id="result-content" hidden>
+          <dl class="file-metadata">
+            <div>
+              <dt>変換したセグメント</dt>
+              <dd id="converted-segment-count">0</dd>
+            </div>
+            <div>
+              <dt>追加した頂点</dt>
+              <dd id="added-point-count">0</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a href="../NOTICE.md">NOTICE</a>
+      <a href="../../LICENSE">MIT License</a>
+      <a href="https://github.com/kshootmania/ksm-v2">K-Shoot MANIA v2</a>
+    </footer>
+
+    <script type="module" src="../utilities/form.js"></script>
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
