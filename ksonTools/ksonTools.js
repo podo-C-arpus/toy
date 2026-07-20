@@ -2,8 +2,10 @@ const list = document.querySelector("#tool-list");
 const count = document.querySelector("#tool-count");
 const status = document.querySelector("#tool-list-status");
 
-const excludedDirectories = new Set(["utilities"]);
-const knownToolDirectories = [new URL("./dynamic_effect/", window.location.href)];
+const toolDirectories = [
+  new URL("./dynamic_effect/", window.location.href),
+  new URL("./curve2polyline/", window.location.href),
+];
 
 const fetchDocument = async (url) => {
   const response = await fetch(url);
@@ -13,29 +15,6 @@ const fetchDocument = async (url) => {
 
   const source = await response.text();
   return new DOMParser().parseFromString(source, "text/html");
-};
-
-const findToolDirectories = async () => {
-  const root = new URL("./", window.location.href);
-  let discoveredDirectories = [];
-
-  try {
-    const directory = await fetchDocument("./");
-    discoveredDirectories = [...directory.querySelectorAll("a[href]")]
-      .map((anchor) => new URL(anchor.getAttribute("href"), root))
-      .filter((url) => url.origin === root.origin && url.pathname.startsWith(root.pathname))
-      .filter((url) => url.pathname.endsWith("/") && url.pathname !== root.pathname)
-      .filter((url) => {
-        const relativePath = decodeURIComponent(url.pathname.slice(root.pathname.length));
-        const segments = relativePath.split("/").filter(Boolean);
-        return segments.length === 1 && !excludedDirectories.has(segments[0]);
-      });
-  } catch (error) {
-    console.warn("ディレクトリ一覧を取得できなかったため、既知のツールのみ表示します。", error);
-  }
-
-  return [...knownToolDirectories, ...discoveredDirectories]
-    .filter((url, index, urls) => urls.findIndex((candidate) => candidate.href === url.href) === index);
 };
 
 const readTool = async (directoryUrl) => {
@@ -73,8 +52,7 @@ const createCard = (tool) => {
 
 const loadTools = async () => {
   try {
-    const directories = await findToolDirectories();
-    const results = await Promise.allSettled(directories.map(readTool));
+    const results = await Promise.allSettled(toolDirectories.map(readTool));
     const tools = results
       .filter((result) => result.status === "fulfilled")
       .map((result) => result.value)
