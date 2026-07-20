@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="tool-title" content="曲線分割ツール">
+    <meta name="description" content="ksonファイル内の曲線へ指定位置の制御点を挿入し、複数の区間へ分割するツール。">
+    <title>曲線分割ツール | ksonTools</title>
+    <link rel="stylesheet" href="../utilities/style.css">
+    <style>
+      .tool-options:disabled {
+        opacity: 0.5;
+      }
+
+      .target-row > span {
+        min-width: 5.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-name" href="../ksonTools.html">Arpusのおもちゃ箱v2</a>
+      <nav aria-label="パンくず">
+        <a href="../ksonTools.html">ツール一覧</a>
+        <span aria-current="page">曲線分割ツール</span>
+      </nav>
+    </header>
+
+    <main class="tool-page">
+      <section class="tool-introduction" aria-labelledby="tool-title">
+        <h1 id="tool-title">曲線分割ツール</h1>
+        <p>指定したYに制御点を挿入し、曲線を複数の区間へ分割します。</p>
+
+        <details class="tool-help">
+          <summary>使い方</summary>
+          <div class="tool-help-content">
+            <ol>
+              <li>変換する <code>.kson</code> ファイルを選択します。</li>
+              <li>分割位置をY単位で入力します。複数指定する場合はカンマまたは空白で区切ります。</li>
+              <li>分割する曲線の種類を選択します。</li>
+              <li>「実行」を押すと、変換済みファイルがダウンロードされます。</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="tool-help">
+          <summary>現在の処理方式</summary>
+          <div class="tool-help-content">
+            <p>分割位置の値は、曲線の始点と終点から直線補間して求めます。</p>
+            <p>分割後の区間には曲線の制御値を設定せず、すべて直線補間にします。曲線形状に近い制御値を求める機能は今後追加予定です。</p>
+            <p>曲線の外側、区間の始点・終点、すでに制御点がある位置は変更されません。</p>
+          </div>
+        </details>
+
+        <details class="tool-help">
+          <summary>ファイルの取り扱い</summary>
+          <div class="tool-help-content">
+            <p>処理はブラウザ内で完結し、選択したファイルはアップロードされません。元のファイルは変更せず、変換結果を別ファイルとして出力します。</p>
+          </div>
+        </details>
+      </section>
+
+      <form id="tool-form" novalidate>
+        <section class="file-section" aria-labelledby="file-heading">
+          <h2 id="file-heading">.kson ファイルを読み込む</h2>
+          <input id="file-input" type="file" accept=".kson,application/json" hidden>
+          <div id="drop-zone" role="button" tabindex="0" aria-describedby="file-name">
+            <p id="file-name" aria-live="polite">.ksonファイルをここへドロップ、またはクリックして選択</p>
+            <dl id="file-metadata" class="file-metadata" hidden>
+              <div>
+                <dt>タイトル</dt>
+                <dd data-meta-title>未設定</dd>
+              </div>
+              <div>
+                <dt>難易度</dt>
+                <dd data-meta-difficulty>未設定</dd>
+              </div>
+              <div>
+                <dt>譜面制作者</dt>
+                <dd data-meta-chart-author>未設定</dd>
+              </div>
+              <div>
+                <dt>レベル</dt>
+                <dd data-meta-level>未設定</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <fieldset id="split-options" class="tool-options" disabled>
+          <legend>分割位置・対象指定</legend>
+
+          <p class="form-field">
+            <label for="split-y-values">分割位置（Y）</label>
+            <input
+              id="split-y-values"
+              name="split-y-values"
+              type="text"
+              inputmode="numeric"
+              placeholder="例: 960, 1200, 1440"
+              autocomplete="off"
+            >
+          </p>
+
+          <div class="form-field target-row">
+            <span>レーザー</span>
+            <div class="choice-group" role="group" aria-label="レーザーの分割対象">
+              <label><input type="checkbox" name="target" value="laser-left" checked> 左</label>
+              <label><input type="checkbox" name="target" value="laser-right" checked> 右</label>
+            </div>
+          </div>
+
+          <div class="form-field target-row">
+            <span>カメラ</span>
+            <div class="choice-group" role="group" aria-label="カメラの分割対象">
+              <label><input type="checkbox" name="target" value="camera-top" checked> top</label>
+              <label><input type="checkbox" name="target" value="camera-bottom" checked> bottom</label>
+              <label><input type="checkbox" name="target" value="camera-side" checked> side</label>
+              <label><input type="checkbox" name="target" value="camera-tilt" checked> tilt</label>
+              <label><input type="checkbox" name="target" value="camera-rotation" checked> rotation</label>
+              <label><input type="checkbox" name="target" value="camera-split" checked> split</label>
+            </div>
+          </div>
+
+          <div class="form-field target-row">
+            <span>その他</span>
+            <div class="choice-group" role="group" aria-label="その他の分割対象">
+              <label><input type="checkbox" name="target" value="scroll-speed" checked> scroll_speed</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <section class="action-section" aria-label="処理の実行">
+          <button id="run-button" type="submit" disabled>実行</button>
+        </section>
+      </form>
+
+      <section class="result-section" aria-labelledby="result-heading">
+        <h2 id="result-heading">結果</h2>
+        <p id="status-message" role="status" aria-live="polite">ファイルを選択してください。</p>
+        <div id="execution-messages" class="execution-messages" hidden>
+          <ul id="message-list"></ul>
+        </div>
+        <div id="result-content" hidden>
+          <dl class="file-metadata">
+            <div>
+              <dt>分割した曲線セグメント</dt>
+              <dd id="split-segment-count">0</dd>
+            </div>
+            <div>
+              <dt>追加した制御点</dt>
+              <dd id="added-point-count">0</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a href="../NOTICE.md">NOTICE</a>
+      <a href="../../LICENSE">MIT License</a>
+      <a href="https://github.com/kshootmania/ksm-v2">K-Shoot MANIA v2</a>
+    </footer>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
