@@ -26,6 +26,10 @@ function quadraticBezier(parameter, control) {
   return 2 * inverse * parameter * control + parameter * parameter;
 }
 
+function quadraticBezierDerivative(parameter, control) {
+  return 2 * (control + (1 - 2 * control) * parameter);
+}
+
 /**
  * Inverts the x component of a quadratic Bezier curve whose points are
  * (0, 0), (controlX, controlY), (1, 1).
@@ -83,6 +87,17 @@ export function createNormalizedCurve(a, b) {
       const parameter = parameterAtX(normalizedTime, a);
       return quadraticBezier(parameter, b);
     },
+
+    /** Returns the parametric tangent vector at a normalized time coordinate. */
+    tangentAt(normalizedTime) {
+      assertUnit('normalizedTime', normalizedTime);
+      const parameter = parameterAtX(normalizedTime, a);
+      return Object.freeze({
+        time: quadraticBezierDerivative(parameter, a),
+        value: quadraticBezierDerivative(parameter, b),
+        parameter,
+      });
+    },
   });
 }
 
@@ -109,6 +124,14 @@ export function scaleCurve(
   const duration = endTime - startTime;
   const valueRange = endValue - startValue;
 
+  const normalizeTime = (time) => {
+    assertFinite('time', time);
+    if (time < startTime - EPSILON || time > endTime + EPSILON) {
+      throw new RangeError('time must be inside the scaled segment.');
+    }
+    return Math.min(1, Math.max(0, (time - startTime) / duration));
+  };
+
   return Object.freeze({
     startTime,
     endTime,
@@ -127,13 +150,18 @@ export function scaleCurve(
     },
 
     valueAt(time) {
-      assertFinite('time', time);
-      if (time < startTime - EPSILON || time > endTime + EPSILON) {
-        throw new RangeError('time must be inside the scaled segment.');
-      }
-
-      const normalizedTime = Math.min(1, Math.max(0, (time - startTime) / duration));
+      const normalizedTime = normalizeTime(time);
       return startValue + normalizedCurve.valueAt(normalizedTime) * valueRange;
+    },
+
+    /** Returns the tangent vector in the segment's time and value scales. */
+    tangentAt(time) {
+      const tangent = normalizedCurve.tangentAt(normalizeTime(time));
+      return Object.freeze({
+        time: tangent.time * duration,
+        value: tangent.value * valueRange,
+        parameter: tangent.parameter,
+      });
     },
   });
 }

@@ -22,7 +22,7 @@ export const CURVE_TARGETS = Object.freeze([
     path: ['note', 'laser', 0, '*section', 1],
     shape: 'graph-section',
     lane: 0,
-    angleScale: { yPerValueUnit: 400 },
+    angleScale: { yPerValueUnit: 800 },
     roundingDigits: 3,
   }),
   target({
@@ -31,7 +31,7 @@ export const CURVE_TARGETS = Object.freeze([
     path: ['note', 'laser', 1, '*section', 1],
     shape: 'graph-section',
     lane: 1,
-    angleScale: { yPerValueUnit: 400 },
+    angleScale: { yPerValueUnit: 800 },
     roundingDigits: 3,
   }),
   target({
@@ -39,15 +39,15 @@ export const CURVE_TARGETS = Object.freeze([
     label: 'Camera tilt',
     path: ['camera', 'tilt'],
     shape: 'tilt',
-    angleScale: { yPerValueUnit: 100 },
+    angleScale: { yPerValueUnit: 200 },
     roundingDigits: 4,
   }),
   ...[
-    ['camera-top', 'zoom_top', 1, 2],
-    ['camera-bottom', 'zoom_bottom', 1, 2],
-    ['camera-side', 'zoom_side', 1, 2],
-    ['camera-rotation', 'rotation_deg', 4, 2],
-    ['camera-split', 'center_split', 1, 2],
+    ['camera-top', 'zoom_top', 2, 2],
+    ['camera-bottom', 'zoom_bottom', 2, 2],
+    ['camera-side', 'zoom_side', 2, 2],
+    ['camera-rotation', 'rotation_deg', 8, 2],
+    ['camera-split', 'center_split', 2, 2],
   ].map(([id, name, yPerValueUnit, roundingDigits]) => target({
     id,
     label: `Camera ${name}`,
@@ -61,7 +61,7 @@ export const CURVE_TARGETS = Object.freeze([
     label: 'Scroll speed',
     path: ['beat', 'scroll_speed'],
     shape: 'graph',
-    angleScale: { yPerValueUnit: 400 },
+    angleScale: { yPerValueUnit: 800 },
     roundingDigits: 4,
   }),
 ]);

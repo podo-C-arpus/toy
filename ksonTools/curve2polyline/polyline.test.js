@@ -11,7 +11,7 @@ import {
 import {
   createOutsideInIntervalOrder,
   sampleHierarchically,
-  turningAngle,
+  tangentAngleDifference,
 } from './refinement.js';
 import { CURVE_TARGET_BY_ID } from './dictionary.js';
 import { mergeCollinearVertices, roundValue } from './simplification.js';
@@ -103,6 +103,18 @@ test('curve scales in time and descending value', () => {
     endValue: -2,
   });
   assert.equal(curve.valueAt(20), 1);
+});
+
+test('scaled curves expose tangent vectors in their actual time and value ranges', () => {
+  const curve = createScaledCurve(0, 1, {
+    startTime: 0,
+    endTime: 120,
+    startValue: 1,
+    endValue: 3,
+  });
+
+  assert.deepEqual(curve.tangentAt(0), { time: 0, value: 4, parameter: 0 });
+  assert.deepEqual(curve.tangentAt(120), { time: 240, value: 0, parameter: 1 });
 });
 
 test('sampling always includes both endpoints', () => {
@@ -247,13 +259,14 @@ test('outside-in order covers every interval including the center', () => {
   ]);
 });
 
-test('turning angles use the target value-to-pulse scale', () => {
-  const angle = turningAngle(
-    { time: 0, value: 0 },
-    { time: 100, value: 1 },
-    { time: 200, value: 1 },
-    { yPerValueUnit: 100 },
-  );
+test('tangent angle differences use the target value-to-pulse scale', () => {
+  const curve = createScaledCurve(0.5, 1, {
+    startTime: 0,
+    endTime: 200,
+    startValue: 0,
+    endValue: 1,
+  });
+  const angle = tangentAngleDifference(curve, 0, 200, { yPerValueUnit: 100 });
   assert.ok(Math.abs(angle - Math.PI / 4) < 1e-12);
 });
 
@@ -318,17 +331,17 @@ test('short segments refine through the same forced hierarchy', () => {
   }), sampleUniform(curve, 15));
 });
 
-test('dictionary entries provide every conversion scale measured in scale.kson', () => {
+test('dictionary entries provide every calibrated conversion scale', () => {
   const expectedScales = {
-    'laser-left': 400,
-    'laser-right': 400,
-    'camera-tilt': 100,
-    'camera-top': 1,
-    'camera-bottom': 1,
-    'camera-side': 1,
-    'camera-rotation': 4,
-    'camera-split': 1,
-    'scroll-speed': 400,
+    'laser-left': 800,
+    'laser-right': 800,
+    'camera-tilt': 200,
+    'camera-top': 2,
+    'camera-bottom': 2,
+    'camera-side': 2,
+    'camera-rotation': 8,
+    'camera-split': 2,
+    'scroll-speed': 800,
   };
 
   for (const [id, yPerValueUnit] of Object.entries(expectedScales)) {
@@ -495,7 +508,7 @@ test('LASER angle-scale balance changes the suppressed subdivision result', () =
   const source = {
     note: {
       laser: [
-        [[0, [[0, 0, [0, 1]], [60, 0.02]]]],
+        [[0, [[0, 0, [0.1, 0.25]], [60, 0.5]]]],
         [],
       ],
     },
@@ -509,6 +522,6 @@ test('LASER angle-scale balance changes the suppressed subdivision result', () =
 
   assert.deepEqual(
     [0.5, 0.707107, 1, 1.414214, 2].map(convertWith),
-    [0, 5, 5, 5, 5],
+    [4, 2, 0, 0, 0],
   );
 });

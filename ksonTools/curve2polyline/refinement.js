@@ -15,33 +15,34 @@ function assertNonNegative(name, value) {
   }
 }
 
-function scaleValue(vertex, angleScale) {
+function scaleTangent(tangent, angleScale) {
   const yPerValueUnit = angleScale?.yPerValueUnit;
   if (!Number.isFinite(yPerValueUnit) || yPerValueUnit <= 0) {
     throw new RangeError('angleScale.yPerValueUnit must be greater than zero.');
   }
-  return { x: vertex.time, y: vertex.value * yPerValueUnit };
+  return { x: tangent.time, y: tangent.value * yPerValueUnit };
 }
 
-/** Returns the deviation from a straight line in radians (0 to PI). */
-export function turningAngle(previous, current, next, angleScale) {
-  const p0 = scaleValue(previous, angleScale);
-  const p1 = scaleValue(current, angleScale);
-  const p2 = scaleValue(next, angleScale);
-  const ax = p1.x - p0.x;
-  const ay = p1.y - p0.y;
-  const bx = p2.x - p1.x;
-  const by = p2.y - p1.y;
-  const aLength = Math.hypot(ax, ay);
-  const bLength = Math.hypot(bx, by);
+/** Returns the angle between a curve's endpoint tangents in radians. */
+export function tangentAngleDifference(curve, startTime, endTime, angleScale) {
+  if (!curve || typeof curve.tangentAt !== 'function') {
+    throw new TypeError('curve must provide tangentAt(time).');
+  }
+  const start = scaleTangent(curve.tangentAt(startTime), angleScale);
+  const end = scaleTangent(curve.tangentAt(endTime), angleScale);
+  const startLength = Math.hypot(start.x, start.y);
+  const endLength = Math.hypot(end.x, end.y);
 
-  if (aLength <= EPSILON || bLength <= EPSILON) return null;
-  return Math.atan2(Math.abs(ax * by - ay * bx), ax * bx + ay * by);
+  if (startLength <= EPSILON || endLength <= EPSILON) return 0;
+  return Math.atan2(
+    Math.abs(start.x * end.y - start.y * end.x),
+    start.x * end.x + start.y * end.y,
+  );
 }
 
 /**
  * Returns every eligible interval exactly once, alternating from both ends.
- * `side` identifies which inner vertex supplies the primary angle.
+ * `side` records the traversal origin; each angle decision is interval-local.
  */
 export function createOutsideInIntervalOrder(vertices, currentInterval) {
   assertNonNegative('currentInterval', currentInterval);
@@ -65,65 +66,6 @@ export function createOutsideInIntervalOrder(vertices, currentInterval) {
     right -= 1;
   }
   return result;
-}
-
-function angleAt(vertices, index, angleScale) {
-  if (index <= 0 || index >= vertices.length - 1) return null;
-  return turningAngle(
-    vertices[index - 1],
-    vertices[index],
-    vertices[index + 1],
-    angleScale,
-  );
-}
-
-function candidateAngle(curve, interval, nextTimes, angleScale) {
-  const times = [
-    interval.start,
-    ...nextTimes.filter((time) => time > interval.start && time < interval.end),
-    interval.end,
-  ];
-  if (times.length < 3) return 0;
-
-  const candidates = sampleCurveAtTimes(curve, times);
-  let maximum = 0;
-  for (let index = 1; index < candidates.length - 1; index += 1) {
-    const angle = turningAngle(
-      candidates[index - 1],
-      candidates[index],
-      candidates[index + 1],
-      angleScale,
-    );
-    if (angle !== null) maximum = Math.max(maximum, angle);
-  }
-  return maximum;
-}
-
-function measureIntervalAngle(
-  curve,
-  vertices,
-  entry,
-  nextTimes,
-  angleScale,
-) {
-  const interval = {
-    start: vertices[entry.index].time,
-    end: vertices[entry.index + 1].time,
-  };
-
-  if (entry.side === 'start') {
-    const angle = angleAt(vertices, entry.index + 1, angleScale);
-    return angle ?? candidateAngle(curve, interval, nextTimes, angleScale);
-  }
-  if (entry.side === 'end') {
-    const angle = angleAt(vertices, entry.index, angleScale);
-    return angle ?? candidateAngle(curve, interval, nextTimes, angleScale);
-  }
-
-  const leftAngle = angleAt(vertices, entry.index, angleScale);
-  const rightAngle = angleAt(vertices, entry.index + 1, angleScale);
-  const localAngle = candidateAngle(curve, interval, nextTimes, angleScale);
-  return Math.max(leftAngle ?? 0, rightAngle ?? 0, localAngle);
 }
 
 /** Refines marked intervals only after every decision has been made. */
@@ -156,11 +98,10 @@ export function refineOnce(
       start: snapshot[entry.index].time,
       end: snapshot[entry.index + 1].time,
     };
-    const shouldRefine = threshold <= 0 || measureIntervalAngle(
+    const shouldRefine = threshold <= 0 || tangentAngleDifference(
       curve,
-      snapshot,
-      entry,
-      nextTimes,
+      interval.start,
+      interval.end,
       angleScale,
     ) >= threshold;
     if (shouldRefine) marked.push(interval);
